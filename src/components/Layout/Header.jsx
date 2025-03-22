@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X, ChevronDown, ArrowRight, ExternalLink } from 'lucide-react';
+import { ChevronDown, ArrowRight } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import BookingModal from '../BookingModal';
+import MenuMovil from '../MenuMovil';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -175,75 +176,10 @@ const Header = () => {
               </button>
             </div>
             
-            <button 
-              className="lg:hidden relative overflow-hidden rounded-full p-2.5 hover:bg-gray-100 transition-colors group"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              <div className="h-6 w-6 relative">
-                <span className={`absolute h-0.5 w-6 bg-gray-700 group-hover:bg-blue-600 transform transition-all duration-300 ease-in-out ${isMenuOpen ? 'rotate-45 translate-y-2.5' : '-translate-y-1'}`}></span>
-                <span className={`absolute h-0.5 w-6 bg-gray-700 group-hover:bg-blue-600 transform transition-all duration-300 ease-in-out ${isMenuOpen ? 'opacity-0' : 'opacity-100'}`}></span>
-                <span className={`absolute h-0.5 w-6 bg-gray-700 group-hover:bg-blue-600 transform transition-all duration-300 ease-in-out ${isMenuOpen ? '-rotate-45 -translate-y-0.5' : 'translate-y-3'}`}></span>
-              </div>
-            </button>
-          </nav>
-        </div>
-        
-        <div 
-          className={`lg:hidden fixed top-0 right-0 h-screen w-full bg-white z-40
-            transform transition-all duration-500 ease-in-out
-            ${isMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}
-          `}
-          style={{
-            clipPath: isMenuOpen 
-              ? 'circle(150% at 100% 0)' 
-              : 'circle(0% at 100% 0)'
-          }}
-        >
-          <div className="pt-20 h-full overflow-y-auto">
-            <div className="flex flex-col space-y-1 p-6">
-              {navItems.map(item => (
-                <a
-                  key={item.id}
-                  href={item.path}
-                  className={`group px-4 py-3.5 rounded-lg transition-all duration-300 flex items-center ${
-                    activeSection === item.id
-                      ? 'bg-blue-50 text-blue-600 border-l-4 border-blue-600'
-                      : 'text-gray-700 hover:bg-gray-50 border-l-4 border-transparent'
-                  }`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setActiveSection(item.id);
-                    setIsMenuOpen(false);
-                    setTimeout(() => {
-                      handleNavigation(e, item.id, item.path);
-                    }, 300);
-                  }}
-                >
-                  <span className="text-lg font-medium">{item.label}</span>
-                  <ArrowRight className={`ml-auto h-5 w-5 transition-transform duration-300 ${activeSection === item.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-50'} ${activeSection === item.id ? 'translate-x-0' : '-translate-x-2 group-hover:translate-x-0'}`} />
-                </a>
-              ))}
-              
-              <div className="pt-6">
-                <button 
-                  className="w-full relative overflow-hidden group bg-gradient-to-r from-blue-600 to-purple-700 text-white px-6 py-4 rounded-xl font-medium shadow-lg shadow-blue-600/10 transition-all duration-300"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    setShowBookingModal(true);
-                  }}
-                >
-                  <span className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-purple-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                  <span className="relative z-10 flex items-center justify-center text-base">
-                    Agendar consulta ahora
-                    <ExternalLink className="h-5 w-5 ml-2 transition-transform duration-300 group-hover:rotate-12" />
-                  </span>
-                  
-                  <span className="absolute inset-0 w-8 h-full bg-white opacity-0 group-hover:opacity-30 blur-md transform -skew-x-12 group-hover:animate-shine"></span>
-                </button>
-              </div>
+            <div className="lg:hidden">
+              <MenuMovil />
             </div>
-          </div>
+          </nav>
         </div>
       </header>
 
