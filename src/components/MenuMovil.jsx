@@ -33,9 +33,11 @@ const MenuMovil = () => {
   }, [isAnimating]);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-indigo-900 via-purple-800 to-indigo-900 shadow-lg rounded-t-xl">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-indigo-900 via-purple-800 to-indigo-900 shadow-lg rounded-t-xl">
       {/* Blur effect backdrop for modern UI */}
       <div className="absolute inset-0 bg-black bg-opacity-20 backdrop-blur-sm rounded-t-xl z-0"></div>
+      {/* Semi-transparent floating effect */}
+      <div className="absolute bottom-full left-0 right-0 h-4 bg-gradient-to-t from-indigo-900/80 to-transparent"></div>
       
       <div className="relative z-10 flex justify-between items-center h-20 px-1">
         {menuItems.map((item) => (
