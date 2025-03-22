@@ -10,16 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@react-spring/web": "^9.7.5",
-    "@react-three/drei": "^9.94.0",
-    "@react-three/fiber": "^8.17.14",
-    "@react-three/rapier": "^2.0.0",
     "@types/react-router-dom": "^5.3.3",
     "framer-motion": "^12.5.0",
     "lucide-react": "^0.483.0",
-    "postprocessing": "^6.37.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-router-dom": "^7.4.0"
   },
   "devDependencies": {
