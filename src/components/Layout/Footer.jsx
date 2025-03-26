@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { MapPin, Phone, Mail, ArrowUpRight, Facebook, Instagram, Linkedin, Twitter, ChevronRight, Globe, Award, Shield } from 'lucide-react';
 import BookingModal from '../BookingModal';
+import ModalLinkTree from '../ModalLinkTree';
 
 const Footer = () => {
   const { theme = 'dark' } = useTheme();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [isLinkTreeModalOpen, setIsLinkTreeModalOpen] = useState(false);
 
   return (
-    <>
+    <div>
       <footer className={`relative overflow-hidden pt-20 pb-8 ${
         theme === 'dark'
           ? 'bg-gradient-to-b from-blue-950 to-black'
@@ -171,20 +173,33 @@ const Footer = () => {
               }`}>
                 <span className="border-b-2 border-blue-500 pb-1">Conéctate</span>
               </h3>
-              <div className="grid grid-cols-2 gap-3">
-                <a href="https://www.facebook.com/impulsa360agency" className={`flex items-center space-x-2 p-3 rounded-lg transition-colors group border ${
-                  theme === 'dark'
-                    ? 'bg-gray-800/50 hover:bg-blue-900/30 border-gray-700/50 hover:border-blue-700/50'
-                    : 'bg-gray-100/50 hover:bg-blue-50 border-gray-200 hover:border-blue-200'
-                }`}>
-                  <img src={theme === 'dark' ? "/img/facebook.svg" : "/img/facebook.svg"} alt="Threads" />
-                </a>
-             
-              </div>
+              <button 
+                onClick={() => setIsLinkTreeModalOpen(true)}
+                className={`p-2 rounded-lg transition-all ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-100 hover:bg-gray-200'}`}
+              >
+                <img 
+                  src={theme === 'dark' ? "/img/LogoImpulsa.png" : "/img/ImpulsaColor2.png"} 
+                  alt="Redes Sociales" 
+                  className="h-10 w-10 object-contain"
+                />
+              </button>
+              {isLinkTreeModalOpen && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                  <div className="relative w-full max-w-md">
+                    <button 
+                      onClick={() => setIsLinkTreeModalOpen(false)}
+                      className="absolute -top-10 right-0 text-white hover:text-gray-300"
+                    >
+                      ✕
+                    </button>
+                    <ModalLinkTree />
+                  </div>
+                </div>
+              )}
               
               <div className="mt-8">
                 <button 
-                  onClick={() => setIsModalOpen(true)}
+                  onClick={() => setIsBookingModalOpen(true)}
                   className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 p-4 rounded-lg text-white font-medium transition-all group w-full justify-center"
                 >
                   <span>Consulta</span>
@@ -229,8 +244,8 @@ const Footer = () => {
         </div>
       </footer>
       
-      <BookingModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-    </>
+      <BookingModal isOpen={isBookingModalOpen} onClose={() => setIsBookingModalOpen(false)} />
+    </div>
   );
 };
 

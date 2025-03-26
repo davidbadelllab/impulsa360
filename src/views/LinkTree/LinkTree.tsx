@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Instagram, Youtube, Linkedin, Video, Globe, Twitter, Sun, Moon, Share2 } from 'lucide-react';
+import { Instagram, Youtube, Linkedin, Video, Globe, Twitter, Sun, Moon, Share2, Facebook, MessageCircle } from 'lucide-react';
 
 const LinkTree = () => {
   const [theme, setTheme] = useState('dark');
@@ -15,6 +15,18 @@ const LinkTree = () => {
   };
 
   const socialLinks = [
+    {
+      name: "Whatsapp",
+      url: "https://wa.me/584246312483",
+      icon: <MessageCircle className="h-6 w-6" />,
+      gradient: "from-green-600 via-green-500 to-green-600"
+    },
+    {
+      name: "Facebook",
+      url: "https://www.facebook.com/impulsa360agency",
+      icon: <Facebook className="h-6 w-6" />,
+      gradient: "from-gray-900 via-gray-800 to-gray-900"
+    },
     {
       name: "Instagram",
       url: "https://www.instagram.com/impulsa360agency",

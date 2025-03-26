@@ -4,6 +4,7 @@ import { useMediaQuery } from 'react-responsive';
 import Header from './components/Layout/Header.jsx';
 import Footer from './components/Layout/Footer.jsx';
 import MenuMovil from './components/MenuMovil.jsx';
+import WhatsAppWidget from './components/WhatsAppWidget.jsx';
 
 
 const App = () => {
@@ -20,6 +21,7 @@ const App = () => {
       ) : (
         <Footer />
       )}
+      <WhatsAppWidget />
     </div>
   );
 };
