@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTheme } from '../../context/ThemeContext';
 import { ArrowRight, Zap, TrendingUp, Globe, Sparkles, ArrowUpRight, ChevronRight, Activity, PieChart, LineChart } from 'lucide-react';
-// import BookingModal from './BookingModal';
+
 
 const Hero = () => {
+  const { theme = 'dark' } = useTheme(); // Tema oscuro por defecto
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -27,6 +29,7 @@ const Hero = () => {
       
       const rect = heroRef.current.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
       setMousePosition({ x, y });
     };
     
@@ -101,7 +104,11 @@ const Hero = () => {
     <section 
       ref={heroRef}
       id="inicio"
-      className="relative min-h-screen overflow-hidden bg-gradient-to-b from-gray-950 via-blue-950 to-gray-950 py-32 lg:py-0 flex items-center"
+      className={`relative min-h-screen overflow-hidden py-32 lg:py-0 flex items-center ${
+        theme === 'dark' 
+          ? 'bg-gradient-to-b from-gray-950 via-blue-950 to-gray-950' 
+          : 'bg-gradient-to-b from-gray-50 via-blue-50 to-gray-50'
+      }`}
       style={{ perspective: '1000px' }}
     >
       {/* Partículas animadas en el fondo */}
@@ -143,8 +150,6 @@ const Hero = () => {
         ></div>
       </div>
       
-      {/* Eliminamos la cuadrícula blanca que estaba aquí anteriormente */}
-
       {/* Línea central dinámica */}
       <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-blue-500/50 to-transparent opacity-70"></div>
 
@@ -157,7 +162,7 @@ const Hero = () => {
               <span className="text-sm font-medium">Innovación Tecnológica Disruptiva</span>
             </div>
             
-            <h1 className="text-5xl md:text-6xl xl:text-7xl font-bold mb-8 text-white leading-tight tracking-tight">
+            <h1 className={`text-5xl md:text-6xl xl:text-7xl font-bold mb-8 ${theme === 'dark' ? 'text-white' : 'text-black'} leading-tight tracking-tight`}>
               <div className="overflow-hidden">
                 <span className="block transform transition-transform duration-1000 delay-200" style={{ transform: isVisible ? 'translateY(0)' : 'translateY(100%)' }}>
                   Revoluciona tu
@@ -166,19 +171,29 @@ const Hero = () => {
               <div className="overflow-hidden">
                 <span className="block transform transition-transform duration-1000 delay-400" style={{ transform: isVisible ? 'translateY(0)' : 'translateY(100%)' }}>
                   <span className="relative">
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 inline-block">presencia digital</span>
-                    <span className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 transform scale-x-0 transition-transform duration-1000 delay-1000 origin-left" style={{ transform: isVisible ? 'scaleX(1)' : 'scaleX(0)' }}></span>
+                    <span className={`bg-clip-text text-transparent inline-block ${
+                      theme === 'dark' 
+                        ? 'bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500' 
+                        : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600'
+                    }`}>presencia digital</span>
+                    <span className={`absolute -bottom-2 left-0 right-0 h-1 transform scale-x-0 transition-transform duration-1000 delay-1000 origin-left ${
+                      theme === 'dark' 
+                        ? 'bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500' 
+                        : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600'
+                    }`} style={{ transform: isVisible ? 'scaleX(1)' : 'scaleX(0)' }}></span>
                   </span>
                 </span>
               </div>
             </h1>
             
-            <p className="text-xl text-gray-300 mb-10 max-w-xl transform transition-all duration-1000 delay-700" style={{ opacity: isVisible ? 1 : 0, transform: isVisible ? 'translateY(0)' : 'translateY(20px)' }}>
+            <p className={`text-xl mb-10 max-w-xl transform transition-all duration-1000 delay-700 ${
+              theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+            }`} style={{ opacity: isVisible ? 1 : 0, transform: isVisible ? 'translateY(0)' : 'translateY(20px)' }}>
               Despliega todo el potencial de tu empresa con soluciones digitales de vanguardia. Estrategias basadas en inteligencia artificial y análisis predictivo para un crecimiento exponencial.
             </p>
             
             <div className="flex flex-wrap gap-6 items-center transform transition-all duration-1000 delay-900" style={{ opacity: isVisible ? 1 : 0, transform: isVisible ? 'translateY(0)' : 'translateY(20px)' }}>           
-              <a href="/success-cases" className="group text-white text-lg inline-flex items-center relative overflow-hidden">
+              <a href="/success-cases" className={`group ${theme === 'dark' ? 'text-white' : 'text-blue-700'} text-lg inline-flex items-center relative overflow-hidden`}>
                 <span className="relative z-10">Ver casos de éxito</span>
                 <ChevronRight size={20} className="ml-1 transition-transform duration-300 transform group-hover:translate-x-1" />
                 <span className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-blue-500 to-purple-500 transform origin-left transition-transform duration-300 scale-x-0 group-hover:scale-x-100"></span>
@@ -190,18 +205,18 @@ const Hero = () => {
               {stats.map((stat, index) => (
                 <div 
                   key={index}
-                  className="relative overflow-hidden bg-gray-900/40 backdrop-blur-md rounded-xl p-4 border border-white/10 group transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                  className={`relative overflow-hidden ${theme === 'dark' ? 'bg-gray-900/40' : 'bg-white/70'} backdrop-blur-md rounded-xl p-4 ${theme === 'dark' ? 'border border-white/10' : 'border border-gray-200'} group transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
                   onMouseEnter={() => setHoverStat(index)}
                   onMouseLeave={() => setHoverStat(null)}
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                  <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-${theme === 'dark' ? '10' : '20'} transition-opacity duration-300`}></div>
                   
                   <div className="flex items-center justify-center flex-col">
                     <div className={`rounded-full p-2 mb-2 bg-gradient-to-r ${stat.color} bg-opacity-20 transition-transform duration-500 ${hoverStat === index ? 'scale-110' : ''}`}>
                       {stat.icon}
                     </div>
-                    <p className="text-2xl font-bold text-white mb-1">{stat.value}</p>
-                    <p className="text-gray-400 text-center text-sm">{stat.label}</p>
+                    <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'} mb-1`}>{stat.value}</p>
+                    <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-center text-sm`}>{stat.label}</p>
                   </div>
                 </div>
               ))}
@@ -215,45 +230,53 @@ const Hero = () => {
               <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl blur-xl opacity-70 animate-pulse-slow"></div>
               
               {/* Contenedor principal con efecto de cristal */}
-              <div className="relative bg-gray-900/80 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20 shadow-2xl group transition-all duration-500 hover:shadow-blue-900/20">
+              <div className={`relative rounded-2xl overflow-hidden backdrop-blur-xl shadow-2xl group transition-all duration-500 ${
+                theme === 'dark' 
+                  ? 'bg-gray-900/80 border border-white/20 hover:shadow-blue-900/20' 
+                  : 'bg-white/80 border border-gray-200 hover:shadow-blue-200/50'
+              }`}>
                 {/* Barra superior degradada */}
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
                 
                 {/* Contenido visual principal */}
                 <div className="p-1">
-                  <img 
-                    src="/img/DashboardMuestra.png" 
-                    alt="Estrategias digitales innovadoras" 
-                    className="w-full h-full object-cover rounded-xl mix-blend-luminosity opacity-90 hover:mix-blend-normal hover:opacity-100 transition-all duration-500"
-                  />
+                    <img 
+                      src="/img/DashboardMuestra.png" 
+                      alt="Estrategias digitales innovadoras" 
+                      className={`w-full h-full object-cover rounded-xl transition-all duration-500 ${
+                        theme === 'dark' 
+                          ? 'mix-blend-luminosity opacity-90 hover:mix-blend-normal hover:opacity-100' 
+                          : 'opacity-90 hover:opacity-100'
+                      }`}
+                    />
                 </div>
                 
                 {/* Elementos flotantes informativos */}
                 <div 
-                  className="absolute top-4 right-4 bg-black/60 backdrop-blur-xl rounded-lg p-3 border border-white/10 shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-blue-500/20"
+                  className={`absolute top-4 right-4 ${theme === 'dark' ? 'bg-black/60' : 'bg-white/80'} backdrop-blur-xl rounded-lg p-3 ${theme === 'dark' ? 'border border-white/10' : 'border border-gray-200'} shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-blue-500/20`}
                   style={{ transform: `translate3d(${mousePosition.x * -15}px, ${mousePosition.y * -15}px, 20px)` }}
                 >
                   <div className="flex items-center">
                     <Globe size={20} className="text-blue-400 mr-2" />
-                    <span className="text-white font-medium">Alcance global</span>
+                    <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Alcance global</span>
                   </div>
-                  <div className="mt-1 text-xs text-gray-400">Presente en +5 países</div>
+                  <div className={`mt-1 text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Presente en +5 países</div>
                 </div>
                 
                 <div 
-                  className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-xl rounded-lg p-3 border border-white/10 shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-green-500/20"
+                  className={`absolute bottom-4 left-4 ${theme === 'dark' ? 'bg-black/60' : 'bg-white/80'} backdrop-blur-xl rounded-lg p-3 ${theme === 'dark' ? 'border border-white/10' : 'border border-gray-200'} shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-green-500/20`}
                   style={{ transform: `translate3d(${mousePosition.x * 15}px, ${mousePosition.y * 15}px, 40px)` }}
                 >
                   <div className="flex items-center">
                     <TrendingUp size={20} className="text-green-400 mr-2" />
-                    <span className="text-white font-medium">+320% ROI promedio</span>
+                    <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>+320% ROI promedio</span>
                   </div>
-                  <div className="mt-1 text-xs text-gray-400">En los últimos 12 meses</div>
+                  <div className={`mt-1 text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>En los últimos 12 meses</div>
                 </div>
                 
                 {/* Característica destacada animada */}
                 <div 
-                  className="absolute bottom-4 right-4 max-w-xs bg-black/70 backdrop-blur-xl rounded-lg overflow-hidden border border-white/10 shadow-lg"
+                  className={`absolute bottom-4 right-4 max-w-xs ${theme === 'dark' ? 'bg-black/70' : 'bg-white/80'} backdrop-blur-xl rounded-lg overflow-hidden ${theme === 'dark' ? 'border border-white/10' : 'border border-gray-200'} shadow-lg`}
                   style={{ transform: `translate3d(${mousePosition.x * 10}px, ${mousePosition.y * 10}px, 30px)` }}
                 >
                   <div className="relative">
@@ -262,8 +285,8 @@ const Hero = () => {
                         {features[activeFeature].icon}
                       </div>
                       <div>
-                        <h3 className="text-white font-medium text-sm">{features[activeFeature].title}</h3>
-                        <p className="text-gray-400 text-xs">{features[activeFeature].description}</p>
+                        <h3 className={`font-medium text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>{features[activeFeature].title}</h3>
+                        <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-xs`}>{features[activeFeature].description}</p>
                       </div>
                     </div>
                     
@@ -289,9 +312,9 @@ const Hero = () => {
       
       {/* Flecha de scroll animada */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-        <div className="flex flex-col items-center text-white/50">
+        <div className={`flex flex-col items-center ${theme === 'dark' ? 'text-white/50' : 'text-gray-500'}`}>
           <p className="text-xs mb-2 tracking-widest">SCROLL</p>
-          <div className="w-px h-8 bg-gradient-to-b from-white/50 to-transparent animate-pulse"></div>
+          <div className={`w-px h-8 bg-gradient-to-b ${theme === 'dark' ? 'from-white/50' : 'from-gray-500'} to-transparent animate-pulse`}></div>
         </div>
       </div>
       

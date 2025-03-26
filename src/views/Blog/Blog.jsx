@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '../../context/ThemeContext';
 import { 
   BookOpen, 
   Clock, 
@@ -202,10 +203,18 @@ const Blog = () => {
     );
   };
 
+  const { theme } = useTheme();
+
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-gray-950 via-gray-900 to-blue-950 py-24">
+    <section className={`relative overflow-hidden py-24 ${
+      theme === 'dark' 
+        ? 'bg-gradient-to-b from-gray-950 via-gray-900 to-blue-950' 
+        : 'bg-gradient-to-b from-gray-50 via-gray-100 to-blue-100'
+    }`}>
       {/* Elementos decorativos de fondo */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-20">
+      <div className={`absolute top-0 left-0 w-full h-full overflow-hidden ${
+        theme === 'dark' ? 'opacity-20' : 'opacity-10'
+      }`}>
         <div className="absolute top-0 right-0 bg-blue-600 w-96 h-96 rounded-full filter blur-3xl animate-pulse" style={{ animationDuration: '8s' }}></div>
         <div className="absolute bottom-0 left-20 bg-purple-600 w-96 h-96 rounded-full filter blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }}></div>
       </div>
@@ -219,14 +228,18 @@ const Blog = () => {
             </div>
           </div>
           
-          <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-4 text-white tracking-tight">
+          <h2 className={`text-4xl md:text-5xl font-extrabold text-center mb-4 tracking-tight ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>
             Conocimiento estratégico
             <span className="block bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 pb-2">
               para profesionales digitales
             </span>
           </h2>
           
-          <p className="text-xl text-gray-300 text-center mb-16 max-w-3xl mx-auto">
+          <p className={`text-xl text-center mb-16 max-w-3xl mx-auto ${
+            theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+          }`}>
             Únete a la conversación y descubre insights exclusivos sobre tecnología, marketing y estrategia empresarial.
           </p>
 
@@ -234,7 +247,13 @@ const Blog = () => {
             {articles.map((article, index) => (
               <div 
                 key={index}
-                className={`bg-gradient-to-br from-gray-900/90 to-gray-950/90 backdrop-blur-lg rounded-2xl overflow-hidden border border-gray-800 hover:border-blue-500/40 transition-all duration-300 group transform hover:scale-[1.01] ${activeArticle === index ? 'ring-2 ring-blue-500/50 ring-offset-2 ring-offset-gray-950' : ''}`}
+                className={`bg-gradient-to-br ${
+                  theme === 'dark' 
+                    ? 'from-gray-900/90 to-gray-950/90 border-gray-800 hover:border-blue-500/40' 
+                    : 'from-gray-50/90 to-gray-100/90 border-gray-200 hover:border-blue-500/40'
+                } backdrop-blur-lg rounded-2xl overflow-hidden transition-all duration-300 group transform hover:scale-[1.01] ${
+                  activeArticle === index ? 'ring-2 ring-blue-500/50 ring-offset-2 ring-offset-gray-950' : ''
+                }`}
                 onMouseEnter={() => setActiveArticle(index)}
                 onMouseLeave={() => setActiveArticle(null)}
               >
@@ -313,17 +332,25 @@ const Blog = () => {
                     </div>
                   </div>
                   
-                  <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors line-clamp-2">
+                  <h3 className={`text-2xl font-bold mb-3 group-hover:text-blue-400 transition-colors line-clamp-2 ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>
                     {article.title}
                   </h3>
                   
-                  <p className="text-gray-300 mb-6 line-clamp-3">
+                  <p className={`mb-6 line-clamp-3 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                  }`}>
                     {article.excerpt}
                   </p>
 
                   <div className="flex flex-wrap gap-2 mb-6">
                     {article.tags.map((tag, idx) => (
-                      <span key={idx} className="px-3 py-1 rounded-full bg-gray-800 text-gray-300 text-sm hover:bg-gray-700 transition-colors cursor-pointer">
+                      <span key={idx} className={`px-3 py-1 rounded-full text-sm hover:bg-gray-700 transition-colors cursor-pointer ${
+                        theme === 'dark' 
+                          ? 'bg-gray-800/80 text-gray-300 border border-gray-700/50' 
+                          : 'bg-gray-200 text-gray-700 border border-gray-300/50'
+                      }`}>
                         <Tag size={12} className="inline mr-1" />
                         {tag}
                       </span>
@@ -333,17 +360,29 @@ const Blog = () => {
                   {/* Interacciones estilo Facebook */}
                   <div className="border-t border-gray-800 pt-4 flex items-center justify-between">
                     <div className="flex items-center space-x-6">
-                      <button className="flex items-center text-gray-400 hover:text-blue-400 transition-colors">
+                      <button className={`flex items-center transition-colors ${
+                        theme === 'dark' 
+                          ? 'text-gray-400 hover:text-blue-400' 
+                          : 'text-gray-500 hover:text-blue-500'
+                      }`}>
                         <ThumbsUp size={16} className="mr-1.5" />
                         <span>{article.likes}</span>
                       </button>
                       
-                      <button className="flex items-center text-gray-400 hover:text-indigo-400 transition-colors">
+                      <button className={`flex items-center transition-colors ${
+                        theme === 'dark' 
+                          ? 'text-gray-400 hover:text-indigo-400' 
+                          : 'text-gray-500 hover:text-indigo-500'
+                      }`}>
                         <MessageCircle size={16} className="mr-1.5" />
                         <span>{article.comments}</span>
                       </button>
                       
-                      <button className="flex items-center text-gray-400 hover:text-purple-400 transition-colors">
+                      <button className={`flex items-center transition-colors ${
+                        theme === 'dark' 
+                          ? 'text-gray-400 hover:text-purple-400' 
+                          : 'text-gray-500 hover:text-purple-500'
+                      }`}>
                         <Share2 size={16} className="mr-1.5" />
                         <span>{article.shares}</span>
                       </button>

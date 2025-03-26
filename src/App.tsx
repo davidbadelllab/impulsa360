@@ -1,17 +1,25 @@
-import './App.css'
-import Header from './components/Layout/Header.jsx'
-import Footer from './components/Layout/Footer.jsx'
-import { Outlet } from 'react-router-dom'
+import './App.css';
+import { Outlet } from 'react-router-dom';
+import { useMediaQuery } from 'react-responsive';
+import Header from './components/Layout/Header.jsx';
+import Footer from './components/Layout/Footer.jsx';
+import MenuMovil from './components/MenuMovil.jsx';
 
 
 const App = () => {
+  const isMobile = useMediaQuery({ maxWidth: 768 });
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <Header />
-      <main>
+      <main className="flex-1">
         <Outlet />
       </main>
-      <Footer />
+      {isMobile ? (
+        <MenuMovil />
+      ) : (
+        <Footer />
+      )}
     </div>
   );
 };

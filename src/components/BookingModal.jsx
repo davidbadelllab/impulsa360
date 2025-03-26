@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '../context/ThemeContext';
 import { 
   Calendar, 
   Clock, 
@@ -19,6 +20,7 @@ import {
 } from 'lucide-react';
 
 const BookingModal = ({ isOpen, onClose }) => {
+  const { theme } = useTheme();
   const [step, setStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
@@ -216,10 +218,14 @@ const BookingModal = ({ isOpen, onClose }) => {
               isSelected 
                 ? 'bg-blue-600 text-white' 
                 : isToday
-                  ? 'bg-blue-900/30 text-blue-300 border border-blue-500/30' 
+                  ? theme === 'dark' 
+                    ? 'bg-blue-900/30 text-blue-300 border border-blue-500/30'
+                    : 'bg-blue-100 text-blue-600 border border-blue-200'
                   : isAvailable && !isWeekend && !isPast
-                    ? 'hover:bg-gray-800 text-white' 
-                    : 'text-gray-600 bg-transparent'
+                    ? theme === 'dark'
+                      ? 'hover:bg-gray-800 text-white'
+                      : 'hover:bg-gray-100 text-gray-800'
+                    : 'text-gray-400 bg-transparent'
             }`}
           >
             {day}
@@ -242,11 +248,13 @@ const BookingModal = ({ isOpen, onClose }) => {
           <button
             key={index}
             onClick={() => setSelectedTime(time)}
-            className={`py-2 px-3 rounded-lg border ${
+            className={`py-2 px-3 rounded-lg border transition-all flex items-center justify-center ${
               selectedTime === time 
                 ? 'bg-blue-600 text-white border-blue-500' 
-                : 'bg-gray-800/50 text-gray-300 border-gray-700 hover:bg-gray-700/50'
-            } transition-all flex items-center justify-center`}
+                : theme === 'dark'
+                  ? 'bg-gray-800/50 text-gray-300 border-gray-700 hover:bg-gray-700/50'
+                  : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+            }`}
           >
             <Clock size={14} className="mr-2" />
             {time}
@@ -260,10 +268,18 @@ const BookingModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="relative bg-gradient-to-br from-gray-900 to-gray-950 rounded-2xl border border-gray-800 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
-        {/* Decoraciones de fondo */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full filter blur-3xl opacity-20"></div>
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600/20 rounded-full filter blur-3xl opacity-20"></div>
+      <div className={`relative rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden ${
+        theme === 'dark' 
+          ? 'bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800' 
+          : 'bg-white border border-gray-200'
+      }`}>
+        {/* Decoraciones de fondo - solo en dark mode */}
+        {theme === 'dark' && (
+          <>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full filter blur-3xl opacity-20"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600/20 rounded-full filter blur-3xl opacity-20"></div>
+          </>
+        )}
         
         {/* Barra de progreso */}
         <div className="h-1 bg-gray-800 relative">
@@ -274,14 +290,20 @@ const BookingModal = ({ isOpen, onClose }) => {
         </div>
         
         {/* Encabezado */}
-        <div className="flex justify-between items-center px-6 py-4 border-b border-gray-800">
-          <h2 className="text-xl font-bold text-white flex items-center">
-            <Calendar className="mr-2 text-blue-400" size={20} />
+        <div className={`flex justify-between items-center px-6 py-4 border-b ${
+          theme === 'dark' ? 'border-gray-800' : 'border-gray-200'
+        }`}>
+          <h2 className={`text-xl font-bold flex items-center ${
+            theme === 'dark' ? 'text-white' : 'text-gray-800'
+          }`}>
+            <Calendar className="mr-2 text-blue-500" size={20} />
             Reserva tu asesoría gratuita
           </h2>
           <button 
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors rounded-full p-1"
+            className={`transition-colors rounded-full p-1 ${
+              theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-700'
+            }`}
           >
             <X size={20} />
           </button>
@@ -292,22 +314,40 @@ const BookingModal = ({ isOpen, onClose }) => {
           {step === 1 && (
             <div className="space-y-6">
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-white mb-2">Selecciona una fecha</h3>
-                <p className="text-gray-400">Elige el día que mejor te convenga para tu asesoría personalizada.</p>
+              <h3 className={`text-lg font-semibold mb-2 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-800'
+              }`}>Selecciona una fecha</h3>
+              <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                Elige el día que mejor te convenga para tu asesoría personalizada.
+              </p>
               </div>
               
-              <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
+              <div className={`rounded-xl p-4 border ${
+                theme === 'dark' 
+                  ? 'bg-gray-900/50 border-gray-800' 
+                  : 'bg-gray-50 border-gray-200'
+              }`}>
                 <div className="flex items-center justify-between mb-4">
                   <button 
                     onClick={prevMonth}
-                    className="p-2 rounded-full bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors"
+                    className={`p-2 rounded-full transition-colors ${
+                      theme === 'dark' 
+                        ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' 
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
                   >
                     <ChevronLeft size={18} />
                   </button>
-                  <h4 className="text-white font-medium capitalize">{getMonthName(currentMonth)}</h4>
+                  <h4 className={`font-medium capitalize ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-800'
+                  }`}>{getMonthName(currentMonth)}</h4>
                   <button 
                     onClick={nextMonth}
-                    className="p-2 rounded-full bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors"
+                    className={`p-2 rounded-full transition-colors ${
+                      theme === 'dark' 
+                        ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' 
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
                   >
                     <ChevronRight size={18} />
                   </button>
@@ -319,8 +359,12 @@ const BookingModal = ({ isOpen, onClose }) => {
               {selectedDate && (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-2">Selecciona una hora</h3>
-                    <p className="text-gray-400">Horarios disponibles para el {formatDate(selectedDate)}:</p>
+                  <h3 className={`text-lg font-semibold mb-2 ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-800'
+                  }`}>Selecciona una hora</h3>
+                  <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                    Horarios disponibles para el {formatDate(selectedDate)}:
+                  </p>
                   </div>
                   
                   {renderTimeSlots()}
@@ -353,8 +397,12 @@ const BookingModal = ({ isOpen, onClose }) => {
           {step === 2 && (
             <div className="space-y-6">
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-white mb-2">Elige el tipo de asesoría</h3>
-                <p className="text-gray-400">Selecciona cómo prefieres que se realice tu asesoría.</p>
+                <h3 className={`text-lg font-semibold mb-2 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-800'
+                }`}>Elige el tipo de asesoría</h3>
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                  Selecciona cómo prefieres que se realice tu asesoría.
+                </p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -373,8 +421,12 @@ const BookingModal = ({ isOpen, onClose }) => {
                       <Video size={24} />
                     </div>
                     <div className="ml-4">
-                      <h4 className="text-white font-medium">Videollamada</h4>
-                      <p className="text-gray-400 text-sm mt-1">
+                      <h4 className={`font-medium ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-800'
+                      }`}>Videollamada</h4>
+                      <p className={`text-sm mt-1 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
                         Asesoría por Zoom, Teams o Google Meet para una experiencia más personal.
                       </p>
                     </div>
@@ -396,8 +448,12 @@ const BookingModal = ({ isOpen, onClose }) => {
                       <PhoneCall size={24} />
                     </div>
                     <div className="ml-4">
-                      <h4 className="text-white font-medium">Llamada telefónica</h4>
-                      <p className="text-gray-400 text-sm mt-1">
+                      <h4 className={`font-medium ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-800'
+                      }`}>Llamada telefónica</h4>
+                      <p className={`text-sm mt-1 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
                         Asesoría mediante llamada telefónica a tu número de contacto.
                       </p>
                     </div>
@@ -441,14 +497,20 @@ const BookingModal = ({ isOpen, onClose }) => {
           {step === 3 && (
             <div className="space-y-6">
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-white mb-2">Completa tus datos</h3>
-                <p className="text-gray-400">Necesitamos un poco más de información para confirmar tu asesoría.</p>
+                <h3 className={`text-lg font-semibold mb-2 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-800'
+                }`}>Completa tus datos</h3>
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                  Necesitamos un poco más de información para confirmar tu asesoría.
+                </p>
               </div>
               
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-gray-300 mb-2 text-sm">Nombre completo</label>
+                    <label className={`block mb-2 text-sm ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                    }`}>Nombre completo</label>
                     <div className="relative">
                       <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                         <User size={16} />
@@ -466,7 +528,9 @@ const BookingModal = ({ isOpen, onClose }) => {
                   </div>
                   
                   <div>
-                    <label className="block text-gray-300 mb-2 text-sm">Correo electrónico</label>
+                    <label className={`block mb-2 text-sm ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                    }`}>Correo electrónico</label>
                     <div className="relative">
                       <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                         <Mail size={16} />
@@ -486,7 +550,9 @@ const BookingModal = ({ isOpen, onClose }) => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-gray-300 mb-2 text-sm">Empresa</label>
+                    <label className={`block mb-2 text-sm ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                    }`}>Empresa</label>
                     <div className="relative">
                       <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                         <Building size={16} />
@@ -503,7 +569,9 @@ const BookingModal = ({ isOpen, onClose }) => {
                   </div>
                   
                   <div>
-                    <label className="block text-gray-300 mb-2 text-sm">Teléfono</label>
+                    <label className={`block mb-2 text-sm ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                    }`}>Teléfono</label>
                     <div className="relative">
                       <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                         <PhoneCall size={16} />
@@ -522,7 +590,9 @@ const BookingModal = ({ isOpen, onClose }) => {
                 </div>
                 
                 <div>
-                  <label className="block text-gray-300 mb-2 text-sm">¿En qué podemos ayudarte?</label>
+                  <label className={`block mb-2 text-sm ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                  }`}>¿En qué podemos ayudarte?</label>
                   <textarea
                     name="message"
                     value={formData.message}
@@ -586,20 +656,28 @@ const BookingModal = ({ isOpen, onClose }) => {
               </div>
               
               <div>
-                <h3 className="text-xl font-bold text-white mb-2">¡Reserva confirmada!</h3>
-                <p className="text-gray-300">
+                <h3 className={`text-xl font-bold mb-2 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-800'
+                }`}>¡Reserva confirmada!</h3>
+                <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>
                   Tu asesoría ha sido agendada con éxito para el {formatDate(selectedDate)} a las {selectedTime}.
                 </p>
               </div>
               
               <div className="bg-gray-900/50 rounded-xl p-6 max-w-md mx-auto">
-                <h4 className="font-semibold text-white mb-4 text-left">Detalles de tu reserva:</h4>
+                <h4 className={`font-semibold mb-4 text-left ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-800'
+                }`}>Detalles de tu reserva:</h4>
                 <div className="space-y-3 text-left">
                   <div className="flex items-start">
                     <CalendarIcon size={18} className="text-blue-400 mt-0.5 mr-3 flex-shrink-0" />
                     <div>
-                      <p className="text-white font-medium">Fecha y hora</p>
-                      <p className="text-gray-400">{formatDate(selectedDate)} - {selectedTime}</p>
+                      <p className={`font-medium ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-800'
+                      }`}>Fecha y hora</p>
+                      <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                        {formatDate(selectedDate)} - {selectedTime}
+                      </p>
                     </div>
                   </div>
                   
@@ -610,22 +688,30 @@ const BookingModal = ({ isOpen, onClose }) => {
                       <PhoneCall size={18} className="text-blue-400 mt-0.5 mr-3 flex-shrink-0" />
                     )}
                     <div>
-                      <p className="text-white font-medium">Modalidad</p>
-                      <p className="text-gray-400">{selectedType === 'video' ? 'Videollamada' : 'Llamada telefónica'}</p>
+                      <p className={`font-medium ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-800'
+                      }`}>Modalidad</p>
+                      <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                        {selectedType === 'video' ? 'Videollamada' : 'Llamada telefónica'}
+                      </p>
                     </div>
                   </div>
                   
                   <div className="flex items-start">
                     <User size={18} className="text-blue-400 mt-0.5 mr-3 flex-shrink-0" />
                     <div>
-                      <p className="text-white font-medium">Asesor asignado</p>
-                      <p className="text-gray-400">Luis Rodríguez, Consultor Senior</p>
+                      <p className={`font-medium ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-800'
+                      }`}>Asesor asignado</p>
+                      <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                        Luis Rodríguez, Consultor Senior
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
               
-              <p className="text-gray-400">
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
                 Hemos enviado un correo de confirmación a <span className="text-white">{formData.email}</span> con todos los detalles.
               </p>
               

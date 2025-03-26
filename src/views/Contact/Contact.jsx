@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTheme } from '../../context/ThemeContext';
 import { 
   Mail, 
   Phone, 
@@ -18,9 +19,12 @@ import {
   Star,
   Loader
 } from 'lucide-react';
+import CoverageMap from '../../components/CoverageMap';
 
 const Contact = () => {
+  const { theme } = useTheme();
   const [isVisible, setIsVisible] = useState(false);
+  const [isMapOpen, setIsMapOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [typing, setTyping] = useState(false);
   const [chatHistory, setChatHistory] = useState([
@@ -233,13 +237,24 @@ const Contact = () => {
       default:
         break;
     }
+
   };
 
   const TypingIndicator = () => (
-    <div className="flex space-x-2 p-3 bg-blue-600/20 rounded-xl w-16">
-      <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-      <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-      <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+    <div className={`flex space-x-2 p-3 rounded-xl w-16 ${
+      theme === 'dark'
+        ? 'bg-blue-600/20'
+        : 'bg-blue-400/20'
+    }`}>
+      <div className={`w-2 h-2 rounded-full animate-pulse ${
+        theme === 'dark' ? 'bg-blue-400' : 'bg-blue-500'
+      }`}></div>
+      <div className={`w-2 h-2 rounded-full animate-pulse ${
+        theme === 'dark' ? 'bg-blue-400' : 'bg-blue-500'
+      }`} style={{ animationDelay: '0.2s' }}></div>
+      <div className={`w-2 h-2 rounded-full animate-pulse ${
+        theme === 'dark' ? 'bg-blue-400' : 'bg-blue-500'
+      }`} style={{ animationDelay: '0.4s' }}></div>
     </div>
   );
 
@@ -254,22 +269,32 @@ const Contact = () => {
     return (
       <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
         {!isUser && (
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center flex-shrink-0 mr-2">
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 mr-2 ${
+            theme === 'dark'
+              ? 'bg-gradient-to-br from-blue-600 to-indigo-600'
+              : 'bg-gradient-to-br from-blue-500 to-indigo-500'
+          }`}>
             <Rocket size={20} className="text-white" />
           </div>
         )}
         <div 
           className={`max-w-[80%] p-4 rounded-2xl ${
             isUser 
-              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white' 
-              : 'bg-gray-800/80 text-gray-100 border border-gray-700'
+              ? theme === 'dark'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'
+                : 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white'
+              : theme === 'dark'
+                ? 'bg-gray-800/80 text-gray-100 border border-gray-700'
+                : 'bg-gray-100/80 text-gray-800 border border-gray-300'
           }`}
         >
           <div className="whitespace-pre-line">{formattedMessage}</div>
         </div>
         {isUser && (
-          <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0 ml-2">
-            <User size={20} className="text-gray-300" />
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ml-2 ${
+            theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'
+          }`}>
+            <User size={20} className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} />
           </div>
         )}
       </div>
@@ -277,7 +302,11 @@ const Contact = () => {
   };
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-gray-950 via-gray-900 to-blue-950 py-24">
+    <section className={`relative overflow-hidden py-24 ${
+      theme === 'dark' 
+        ? 'bg-gradient-to-b from-gray-950 via-gray-900 to-blue-950' 
+        : 'bg-gradient-to-b from-gray-100 via-gray-50 to-blue-100'
+    }`}>
       {/* Elementos decorativos de fondo */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-20">
         <div className="absolute top-0 right-0 bg-blue-600 w-96 h-96 rounded-full filter blur-3xl animate-pulse" style={{ animationDuration: '8s' }}></div>
@@ -293,43 +322,74 @@ const Contact = () => {
             </div>
           </div>
           
-          <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-4 text-white tracking-tight">
+          <h2 className={`text-4xl md:text-5xl font-extrabold text-center mb-4 tracking-tight ${
+            theme === 'dark' ? 'text-white' : 'text-gray-800'
+          }`}>
             ¿Listo para impulsar
             <span className="block bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 pb-2">
               tu presencia digital?
             </span>
           </h2>
           
-          <p className="text-xl text-gray-300 text-center mb-16 max-w-3xl mx-auto">
+          <p className={`text-xl text-center mb-16 max-w-3xl mx-auto ${
+            theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+          }`}>
             Agenda una consulta gratuita y descubre cómo podemos ayudarte a alcanzar tus objetivos digitales.
           </p>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
             {/* Chat Interactivo */}
-            <div className="bg-gradient-to-br from-gray-900/90 to-gray-950/90 backdrop-blur-lg rounded-2xl p-6 border border-gray-800 shadow-2xl shadow-blue-900/20 h-[600px] flex flex-col overflow-hidden relative" style={{ minHeight: '600px', maxHeight: '600px' }}>
+            <div className={`backdrop-blur-lg rounded-2xl p-6 shadow-2xl h-[600px] flex flex-col overflow-hidden relative ${
+              theme === 'dark'
+                ? 'bg-gradient-to-br from-gray-900/90 to-gray-950/90 border border-gray-800 shadow-blue-900/20'
+                : 'bg-white/90 border border-gray-200 shadow-blue-400/20'
+            }`} style={{ minHeight: '600px', maxHeight: '600px' }}>
               {/* Encabezado del chat */}
-              <div className="flex items-center justify-between p-3 border-b border-gray-800 mb-4">
+              <div className={`flex items-center justify-between p-3 border-b mb-4 ${
+                theme === 'dark' ? 'border-gray-800' : 'border-gray-200'
+              }`}>
                 <div className="flex items-center space-x-2">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    theme === 'dark'
+                      ? 'bg-gradient-to-br from-blue-600 to-indigo-600'
+                      : 'bg-gradient-to-br from-blue-500 to-indigo-500'
+                  }`}>
                     <Zap size={20} className="text-white" />
                   </div>
                   <div>
-                    <h3 className="text-white font-bold">Asistente Impulsa360</h3>
+                    <h3 className={`font-bold ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-800'
+                    }`}>Asistente Impulsa360</h3>
+                    <p className={`text-xs ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>Versión 2.0</p>
                     <div className="flex items-center">
                       <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                      <span className="text-green-400 text-xs">En línea</span>
+                      <span className={`text-xs ${
+                        theme === 'dark' ? 'text-green-400' : 'text-green-600'
+                      }`}>En línea</span>
                     </div>
                   </div>
                 </div>
                 <div className="flex space-x-1">
-                  <div className="w-2 h-2 rounded-full bg-gray-600"></div>
-                  <div className="w-2 h-2 rounded-full bg-gray-600"></div>
-                  <div className="w-2 h-2 rounded-full bg-gray-600"></div>
+                  <div className={`w-2 h-2 rounded-full ${
+                    theme === 'dark' ? 'bg-gray-600' : 'bg-gray-400'
+                  }`}></div>
+                  <div className={`w-2 h-2 rounded-full ${
+                    theme === 'dark' ? 'bg-gray-600' : 'bg-gray-400'
+                  }`}></div>
+                  <div className={`w-2 h-2 rounded-full ${
+                    theme === 'dark' ? 'bg-gray-600' : 'bg-gray-400'
+                  }`}></div>
                 </div>
               </div>
               
               {/* Área de mensajes */}
-              <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4 mb-4 custom-scrollbar" style={{ height: 'calc(100% - 120px)' }}>
+              <div className={`flex-1 overflow-y-auto px-3 py-4 space-y-4 mb-4 custom-scrollbar ${
+                theme === 'dark' 
+                  ? 'custom-scrollbar-dark' 
+                  : 'custom-scrollbar-light'
+              }`} style={{ height: 'calc(100% - 120px)' }}>
                 {chatHistory.map((chat, index) => (
                   <ChatBubble 
                     key={index} 
@@ -342,18 +402,28 @@ const Contact = () => {
               </div>
               
               {/* Área de entrada */}
-              <form onSubmit={handleSubmit} className="p-2 border-t border-gray-800">
+              <form onSubmit={handleSubmit} className={`p-2 border-t ${
+                theme === 'dark' ? 'border-gray-800' : 'border-gray-200'
+              }`}>
                 <div className="flex items-center space-x-2">
                   <input
                     type="text"
                     value={currentInput}
                     onChange={handleInputChange}
-                    className="flex-1 px-4 py-3 rounded-xl bg-gray-800/50 border border-gray-700 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                    className={`flex-1 px-4 py-3 rounded-xl border focus:outline-none transition-colors ${
+                      theme === 'dark'
+                        ? 'bg-gray-800/50 border-gray-700 text-white focus:border-blue-500'
+                        : 'bg-gray-100/50 border-gray-300 text-gray-800 focus:border-blue-400'
+                    }`}
                     placeholder="Escribe tu respuesta..."
                   />
                   <button
                     type="submit"
-                    className="p-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    className={`p-3 rounded-xl text-white transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-opacity-50 ${
+                      theme === 'dark'
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:ring-blue-500'
+                        : 'bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 focus:ring-blue-400'
+                    }`}
                   >
                     <Send size={20} />
                   </button>
@@ -379,12 +449,18 @@ const Contact = () => {
             </div>
 
             {/* Información de contacto - Panel Mejorado */}
-            <div className="bg-gradient-to-br from-gray-900/90 to-gray-950/90 backdrop-blur-lg rounded-2xl p-8 border border-gray-800 shadow-xl transform hover:scale-[1.01] transition-all duration-300">
+            <div className={`backdrop-blur-lg rounded-2xl p-8 shadow-xl transform hover:scale-[1.01] transition-all duration-300 ${
+              theme === 'dark' 
+                ? 'bg-gradient-to-br from-gray-900/90 to-gray-950/90 border border-gray-800' 
+                : 'bg-white/90 border border-gray-200'
+            }`}>
               <div className="flex items-center space-x-4 mb-6">
                 <div className="p-3 rounded-xl bg-gradient-to-br from-blue-600/50 to-indigo-600/50">
                   <Mail className="h-6 w-6 text-blue-300" />
                 </div>
-                <h3 className="text-2xl font-bold text-white">Información de contacto</h3>
+                <h3 className={`text-2xl font-bold ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-800'
+                }`}>Información de contacto</h3>
               </div>
               
               <div className="space-y-6">
@@ -393,8 +469,12 @@ const Contact = () => {
                     <MapPin className="h-6 w-6 text-blue-400" />
                   </div>
                   <div>
-                    <h4 className="text-white font-medium mb-1">Ubicación principal</h4>
-                    <p className="text-gray-300">
+                    <h4 className={`font-medium mb-1 ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-800'
+                    }`}>Ubicación principal</h4>
+                    <p className={`${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                    }`}>
                       Maracaibo, Venezuela<br />
                       Edificio Millenium, Torre A, Piso 5
                     </p>
@@ -406,9 +486,15 @@ const Contact = () => {
                     <Phone className="h-6 w-6 text-blue-400" />
                   </div>
                   <div>
-                    <h4 className="text-white font-medium mb-1">Teléfono directo</h4>
-                    <p className="text-gray-300">+58 (424) 631-2483</p>
-                    <p className="text-gray-400 text-sm mt-1">Disponible para WhatsApp</p>
+                    <h4 className={`font-medium mb-1 ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-800'
+                    }`}>Teléfono directo</h4>
+                    <p className={`${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                    }`}>+58 (424) 631-2483</p>
+                    <p className={`text-sm mt-1 ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>Disponible para WhatsApp</p>
                   </div>
                 </div>
 
@@ -417,9 +503,15 @@ const Contact = () => {
                     <Mail className="h-6 w-6 text-blue-400" />
                   </div>
                   <div>
-                    <h4 className="text-white font-medium mb-1">Correo electrónico</h4>
-                    <p className="text-gray-300">impulsa360agency@gmail.com</p>
-                    <p className="text-gray-400 text-sm mt-1">Respuesta en menos de 24h</p>
+                    <h4 className={`font-medium mb-1 ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-800'
+                    }`}>Correo electrónico</h4>
+                    <p className={`${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                    }`}>impulsa360agency@gmail.com</p>
+                    <p className={`text-sm mt-1 ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>Respuesta en menos de 24h</p>
                   </div>
                 </div>
 
@@ -428,14 +520,24 @@ const Contact = () => {
                     <Clock className="h-6 w-6 text-blue-400" />
                   </div>
                   <div>
-                    <h4 className="text-white font-medium mb-1">Horario de atención</h4>
+                    <h4 className={`font-medium mb-1 ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-800'
+                    }`}>Horario de atención</h4>
                     <div className="flex items-center mb-1">
-                      <span className="text-gray-300 w-32">Lunes - Viernes:</span>
-                      <span className="text-blue-300">9:00 AM - 6:00 PM</span>
+                      <span className={`w-32 ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                      }`}>Lunes - Viernes:</span>
+                      <span className={`${
+                        theme === 'dark' ? 'text-blue-300' : 'text-blue-500'
+                      }`}>9:00 AM - 6:00 PM</span>
                     </div>
                     <div className="flex items-center">
-                      <span className="text-gray-300 w-32">Sábado:</span>
-                      <span className="text-blue-300">9:00 AM - 1:00 PM</span>
+                      <span className={`w-32 ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                      }`}>Sábado:</span>
+                      <span className={`${
+                        theme === 'dark' ? 'text-blue-300' : 'text-blue-500'
+                      }`}>9:00 AM - 1:00 PM</span>
                     </div>
                   </div>
                 </div>
@@ -444,12 +546,18 @@ const Contact = () => {
           </div>
           
           {/* Cobertura Global - Ancho completo */}
-          <div className="bg-gradient-to-br from-gray-900/90 to-gray-950/90 backdrop-blur-lg rounded-2xl p-8 border border-gray-800 shadow-xl transform hover:scale-[1.01] transition-all duration-300">
+          <div className={`backdrop-blur-lg rounded-2xl p-8 shadow-xl transform hover:scale-[1.01] transition-all duration-300 ${
+            theme === 'dark' 
+              ? 'bg-gradient-to-br from-gray-900/90 to-gray-950/90 border border-gray-800' 
+              : 'bg-white/90 border border-gray-200'
+          }`}>
             <div className="flex items-center space-x-4 mb-8">
               <div className="p-3 rounded-xl bg-gradient-to-br from-purple-600/50 to-indigo-600/50">
                 <Globe className="h-6 w-6 text-purple-300" />
               </div>
-              <h3 className="text-2xl font-bold text-white">Cobertura global</h3>
+              <h3 className={`text-2xl font-bold ${
+                theme === 'dark' ? 'text-white' : 'text-gray-800'
+              }`}>Cobertura global</h3>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -457,7 +565,9 @@ const Contact = () => {
                 <div className="mt-2 flex-shrink-0">
                   <Star className="h-5 w-5 text-yellow-400" />
                 </div>
-                <p className="text-gray-300">
+                <p className={`${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                }`}>
                   Brindamos servicios a clientes en toda Latinoamérica y España. Contáctanos para discutir cómo podemos ayudarte, sin importar tu ubicación.
                 </p>
               </div>
@@ -465,36 +575,66 @@ const Contact = () => {
               <div className="grid grid-cols-2 md:grid-cols-2 gap-3 col-span-1 md:col-span-2">
                 <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 rounded-xl border border-gray-800 flex items-center space-x-2 transform hover:translate-y-[-2px] transition-all duration-300">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-gray-300">España</span>
+                  <span className={`${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                  }`}>España</span>
                 </div>
                 <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 rounded-xl border border-gray-800 flex items-center space-x-2 transform hover:translate-y-[-2px] transition-all duration-300">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-gray-300">México</span>
+                  <span className={`${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                  }`}>México</span>
                 </div>
                 <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 rounded-xl border border-gray-800 flex items-center space-x-2 transform hover:translate-y-[-2px] transition-all duration-300">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-gray-300">Colombia</span>
+                  <span className={`${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                  }`}>Colombia</span>
                 </div>
                 <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 rounded-xl border border-gray-800 flex items-center space-x-2 transform hover:translate-y-[-2px] transition-all duration-300">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-gray-300">Venezuela</span>
+                  <span className={`${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                  }`}>Venezuela</span>
                 </div>
                 <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 rounded-xl border border-gray-800 flex items-center space-x-2 transform hover:translate-y-[-2px] transition-all duration-300">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-gray-300">Argentina</span>
+                  <span className={`${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                  }`}>Argentina</span>
                 </div>
                 <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 rounded-xl border border-gray-800 flex items-center space-x-2 transform hover:translate-y-[-2px] transition-all duration-300">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-gray-300">Chile</span>
+                  <span className={`${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                  }`}>Chile</span>
+                </div>
+                <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 rounded-xl border border-gray-800 flex items-center space-x-2 transform hover:translate-y-[-2px] transition-all duration-300">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className={`${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                  }`}>Estados Unidos</span>
+                </div>
+                <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 rounded-xl border border-gray-800 flex items-center space-x-2 transform hover:translate-y-[-2px] transition-all duration-300">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className={`${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                  }`}>Emiratos Árabes Unidos</span>
+                </div>
+                <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 rounded-xl border border-gray-800 flex items-center space-x-2 transform hover:translate-y-[-2px] transition-all duration-300">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className={`${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                  }`}>El Salvador</span>
                 </div>
               </div>
             </div>
             
             <div className="mt-8 flex justify-center">
-              <button className="inline-flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600/20 to-indigo-600/20 text-purple-300 border border-purple-700/30 hover:bg-gradient-to-r hover:from-purple-600/30 hover:to-indigo-600/30 transition-all transform hover:scale-105">
-                Ver mapa de cobertura completa
-                <ArrowUpRight size={16} className="ml-2 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-              </button>
+            <button className="inline-flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600/20 to-indigo-600/20 text-purple-300 border border-purple-700/30 hover:bg-gradient-to-r hover:from-purple-600/30 hover:to-indigo-600/30 transition-all transform hover:scale-105" onClick={() => setIsMapOpen(true)}>
+              Ver mapa de cobertura
+              <ArrowUpRight size={16} className="ml-2 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+            </button>
             </div>
           </div>
         </div>
@@ -515,18 +655,34 @@ const Contact = () => {
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
+        .custom-scrollbar-dark::-webkit-scrollbar-track {
           background: rgba(31, 41, 55, 0.5);
           border-radius: 10px;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
+        .custom-scrollbar-dark::-webkit-scrollbar-thumb {
           background: rgba(59, 130, 246, 0.5);
           border-radius: 10px;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        .custom-scrollbar-dark::-webkit-scrollbar-thumb:hover {
           background: rgba(59, 130, 246, 0.7);
         }
+        .custom-scrollbar-light::-webkit-scrollbar-track {
+          background: rgba(229, 231, 235, 0.5);
+          border-radius: 10px;
+        }
+        .custom-scrollbar-light::-webkit-scrollbar-thumb {
+          background: rgba(59, 130, 246, 0.3);
+          border-radius: 10px;
+        }
+        .custom-scrollbar-light::-webkit-scrollbar-thumb:hover {
+          background: rgba(59, 130, 246, 0.5);
+        }
       `}</style>
+      {/* Modal del mapa de cobertura */}
+      <CoverageMap 
+        isOpen={isMapOpen} 
+        onClose={() => setIsMapOpen(false)}
+      />
     </section>
   );
 };

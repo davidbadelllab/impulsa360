@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '../../context/ThemeContext';
 import { 
   Trophy, 
   TrendingUp, 
@@ -210,16 +211,28 @@ const SuccessCases = () => {
         </svg>
         
         <div className="absolute flex flex-col items-center justify-center">
-          <Icon size={18} className="mb-1 text-gray-300" />
-          <div className="text-xl font-bold text-white">{percentage}%</div>
-          <div className="text-xs text-gray-400 mt-1 text-center">{label}</div>
+          <Icon size={18} className={`mb-1 ${
+            theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+          }`} />
+          <div className={`text-xl font-bold ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>{percentage}%</div>
+          <div className={`text-xs mt-1 text-center ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+          }`}>{label}</div>
         </div>
       </div>
     );
   };
 
+  const { theme } = useTheme();
+
   return (
-    <section className="relative overflow-hidden bg-gradient-to-r from-gray-900 to-blue-900 py-20">
+    <section className={`relative overflow-hidden py-20 ${
+      theme === 'dark' 
+        ? 'bg-gradient-to-r from-gray-900 to-blue-900' 
+        : 'bg-gradient-to-r from-gray-50 to-blue-50'
+    }`}>
       {/* Elementos decorativos de fondo */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10">
         <div className="absolute top-0 right-0 bg-blue-400 w-64 h-64 rounded-full filter blur-3xl"></div>
@@ -237,14 +250,18 @@ const SuccessCases = () => {
             </div>
           </div>
           
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-white">
+          <h2 className={`text-4xl md:text-5xl font-bold text-center mb-4 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>
             Resultados que hablan
-            <span className="block bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500">
+            <span className="block bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600">
               por sí mismos
             </span>
           </h2>
           
-          <p className="text-xl text-gray-300 text-center mb-16 max-w-3xl mx-auto">
+          <p className={`text-xl text-center mb-16 max-w-3xl mx-auto ${
+            theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+          }`}>
             Descubre cómo hemos ayudado a empresas líderes a alcanzar sus objetivos digitales y superar sus expectativas.
           </p>
 
@@ -252,39 +269,69 @@ const SuccessCases = () => {
             {cases.map((case_, index) => (
               <div 
                 key={index}
-                className={`bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-xl rounded-2xl p-8 border border-gray-700/50 hover:border-blue-500/30 transition-all duration-500 group ${activeCase === index ? 'scale-[1.01]' : ''}`}
+                className={`backdrop-blur-xl rounded-2xl p-8 transition-all duration-500 group ${activeCase === index ? 'scale-[1.01]' : ''} ${
+                  theme === 'dark' 
+                    ? 'bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-700/50 hover:border-blue-500/30' 
+                    : 'bg-white/80 border border-gray-200/80 hover:border-blue-400/50 shadow-sm'
+                }`}
                 onMouseEnter={() => setActiveCase(index)}
               >
                 <div className="grid md:grid-cols-2 gap-8">
                   <div>
                     <div className="flex items-center space-x-2 mb-4">
-                      <h3 className="text-2xl font-bold text-white">{case_.company}</h3>
-                      <span className="px-3 py-1 rounded-full bg-blue-900/30 text-blue-300 text-sm">
+                    <h3 className={`text-2xl font-bold ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>{case_.company}</h3>
+                    <span className={`px-3 py-1 rounded-full text-sm ${
+                      theme === 'dark' 
+                        ? 'bg-blue-900/30 text-blue-300' 
+                        : 'bg-blue-100 text-blue-700'
+                    }`}>
                         {case_.industry}
                       </span>
                     </div>
 
-                    <p className="text-gray-300 mb-6">{case_.description}</p>
+                    <p className={`mb-6 ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                    }`}>{case_.description}</p>
 
                     <div className="grid grid-cols-3 gap-4 mb-8">
                       {case_.results.map((result, idx) => (
-                        <div key={idx} className="bg-gray-800/50 backdrop-blur-lg rounded-lg p-4 text-center border border-gray-700/30 hover:border-gray-600/50 transition-all duration-300">
-                          <result.icon size={24} className="text-blue-400 mx-auto mb-2" />
-                          <div className="text-2xl font-bold text-white mb-1">{result.value}</div>
-                          <div className="text-sm text-gray-400">{result.label}</div>
+                        <div key={idx} className={`backdrop-blur-lg rounded-lg p-4 text-center transition-all duration-300 ${
+                          theme === 'dark' 
+                            ? 'bg-gray-800/50 border border-gray-700/30 hover:border-gray-600/50' 
+                            : 'bg-white border border-gray-200 hover:border-gray-300'
+                        }`}>
+                          <result.icon size={24} className={`mx-auto mb-2 ${
+                            theme === 'dark' ? 'text-blue-400' : 'text-blue-500'
+                          }`} />
+                          <div className={`text-2xl font-bold mb-1 ${
+                            theme === 'dark' ? 'text-white' : 'text-gray-900'
+                          }`}>{result.value}</div>
+                          <div className={`text-sm ${
+                            theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                          }`}>{result.label}</div>
                         </div>
                       ))}
                     </div>
 
                     <div className="flex flex-wrap gap-2">
                       {case_.tags.map((tag, idx) => (
-                        <span key={idx} className="px-3 py-1 rounded-full bg-indigo-900/30 text-indigo-300 text-sm">
+                        <span key={idx} className={`px-3 py-1 rounded-full text-sm ${
+                          theme === 'dark' 
+                            ? 'bg-indigo-900/30 text-indigo-300' 
+                            : 'bg-indigo-100 text-indigo-700'
+                        }`}>
                           {tag}
                         </span>
                       ))}
                     </div>
                     
-                    <button className="mt-6 inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors">
+                    <button className={`mt-6 inline-flex items-center transition-colors ${
+                      theme === 'dark' 
+                        ? 'text-blue-400 hover:text-blue-300' 
+                        : 'text-blue-600 hover:text-blue-500'
+                    }`}>
                       Ver caso completo
                       <ExternalLink size={14} className="ml-1.5" />
                     </button>
@@ -293,14 +340,20 @@ const SuccessCases = () => {
                   <div className="relative">
                     <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-600/20 rounded-xl blur-md opacity-30 group-hover:opacity-70 transition-all duration-500"></div>
                     <div className="relative p-1 h-full flex flex-col">
-                      <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl p-5 border border-gray-800 h-full">
+                      <div className={`backdrop-blur-sm rounded-xl p-5 h-full ${
+                        theme === 'dark' 
+                          ? 'bg-gray-900/80 border border-gray-800' 
+                          : 'bg-white/90 border border-gray-200'
+                      }`}>
                         <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-800">
                           <div className="flex items-center space-x-1.5">
                             <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
                             <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
                             <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
                           </div>
-                          <div className="text-xs text-gray-500">dashboard-metrics.io</div>
+                          <div className={`text-xs ${
+                            theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                          }`}>dashboard-metrics.io</div>
                         </div>
                         
                         <div className="mb-6">
