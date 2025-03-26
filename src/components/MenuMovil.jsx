@@ -9,14 +9,14 @@ const MenuMovil = () => {
   const [isAnimating, setIsAnimating] = useState(false);
 
   const menuItems = [
-    { id: 'hero', icon: <Home size={24} />, label: 'Inicio', path: '/' },
-    { id: 'services', icon: <Rocket size={24} />, label: 'Servicios', path: '/services' },
-    { id: 'systems', icon: <Server size={24} />, label: 'Sistemas', path: '/systems' },
-    { id: 'success-cases', icon: <Trophy size={24} />, label: 'Casos de Éxito', path: '/success-cases' },
-    { id: 'blog', icon: <BookOpen size={24} />, label: 'Comunidad', path: '/blog' },
-    { id: 'contact', icon: <PhoneCall size={24} />, label: 'Contacto', path: '/contact' },
-    { id: 'about', icon: <UserRound size={24} />, label: 'Quienes somos', path: '/about' },
-    { id: 'faq', icon: <HelpCircle size={24} />, label: 'FAQ', path: '/faq' }
+    { id: 'hero', icon: <Home size={24} />, path: '/' },
+    { id: 'services', icon: <Rocket size={24} />,  path: '/services' },
+    { id: 'systems', icon: <Server size={24} />,  path: '/systems' },
+    { id: 'success-cases', icon: <Trophy size={24} />,  path: '/success-cases' },
+    { id: 'blog', icon: <BookOpen size={24} />,  path: '/blog' },
+    { id: 'contact', icon: <PhoneCall size={24} />,  path: '/contact' },
+    { id: 'about', icon: <UserRound size={24} />,  path: '/about' },
+    { id: 'faq', icon: <HelpCircle size={24} />,  path: '/faq' }
   ];
 
 
@@ -40,13 +40,13 @@ const MenuMovil = () => {
   }, [isAnimating]);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[9999] bg-gradient-to-r from-indigo-900 via-purple-800 to-indigo-900 shadow-lg rounded-t-xl" style={{ transform: 'translateZ(0)' }}>
+    <div className="fixed bottom-0 left-0 right-0 z-[70] bg-gradient-to-r from-indigo-900 via-purple-800 to-indigo-900 shadow-lg rounded-t-xl" style={{ transform: 'translateZ(0)' }}>
       {/* Blur effect backdrop for modern UI */}
       <div className="absolute inset-0 bg-black bg-opacity-20 backdrop-blur-sm rounded-t-xl z-0"></div>
       {/* Semi-transparent floating effect */}
       <div className="absolute bottom-full left-0 right-0 h-4 bg-gradient-to-t from-indigo-900/80 to-transparent"></div>
       
-      <div className="relative z-10 flex justify-between items-center h-20 px-1">
+      <div className="relative z-10 flex justify-between items-center h-16 px-1 pb-1">
         {menuItems.map((item) => (
           <button
             key={item.id}

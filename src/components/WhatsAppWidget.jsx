@@ -83,7 +83,7 @@ const WhatsAppWidget = () => {
   if (!showWidget) return null;
 
   return (
-    <div className={`fixed bottom-4 right-4 z-50 transition-transform duration-500 ${showWidget ? 'translate-y-0' : 'translate-y-full'}`}>
+    <div className={`fixed bottom-20 right-4 z-[60] transition-transform duration-500 ${showWidget ? 'translate-y-0' : 'translate-y-full'}`}>
       <div className={`absolute bottom-20 right-0 w-96 transform transition-all duration-300 ${isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'}`}>
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col">
           {/* Header */}
