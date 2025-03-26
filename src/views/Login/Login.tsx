@@ -10,8 +10,8 @@ const Login = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const videoRef = useRef(null);
-  const loginContainerRef = useRef(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const loginContainerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   // Efecto visual para la animación inicial y transición cuando termine el video
@@ -21,16 +21,16 @@ const Login = () => {
     
     // Animación inicial para fade-in
     const fadeInTimer = setTimeout(() => {
-      loginContainer.classList.add('opacity-100');
-      loginContainer.classList.remove('opacity-0', 'translate-y-4');
+      loginContainer?.classList.add('opacity-100');
+      loginContainer?.classList.remove('opacity-0', 'translate-y-4');
     }, 300);
 
     // Evento para cuando termine el video, mover al centro
     const handleVideoEnd = () => {
       console.log('Video ended, centering form');
-      loginContainer.classList.add('transition-all', 'duration-1000', 'ease-in-out');
-      loginContainer.classList.remove('ml-16');
-      loginContainer.classList.add('mx-auto');
+      loginContainer?.classList.add('transition-all', 'duration-1000', 'ease-in-out');
+      loginContainer?.classList.remove('ml-16');
+      loginContainer?.classList.add('mx-auto');
     };
 
     if (video) {
@@ -45,7 +45,7 @@ const Login = () => {
     };
   }, []);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -54,18 +54,18 @@ const Login = () => {
     if (error) setError('');
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      const response = await axios.post('http://localhost:3001/api/login', {
+      const response = await axios.post<{token: string}>('http://localhost:3001/api/login', {
         username: formData.username,
         password: formData.password
       });
       
       // Efecto visual para indicar éxito antes de navegar
-      document.getElementById('login-form').classList.add('scale-95', 'opacity-0');
+      document.getElementById('login-form')?.classList.add('scale-95', 'opacity-0');
       
       setTimeout(() => {
         localStorage.setItem('token', response.data.token);
@@ -77,9 +77,9 @@ const Login = () => {
       setIsLoading(false);
       
       // Efecto visual para indicar error
-      document.getElementById('login-form').classList.add('shake');
+      document.getElementById('login-form')?.classList.add('shake');
       setTimeout(() => {
-        document.getElementById('login-form').classList.remove('shake');
+        document.getElementById('login-form')?.classList.remove('shake');
       }, 500);
     }
   };
@@ -214,7 +214,7 @@ const Login = () => {
           </form>
         </div>
         
-        <style jsx>{`
+        <style>{`
           @keyframes shake {
             0% { transform: translateX(0); }
             20% { transform: translateX(-10px); }
