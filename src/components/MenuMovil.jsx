@@ -1,25 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { Rocket, Server, Trophy, BookOpen, PhoneCall } from 'lucide-react';
+import { Rocket, Server, Trophy, BookOpen, PhoneCall, Home, UserRound, HelpCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const MenuMovil = () => {
-  const [activeItem, setActiveItem] = useState('servicios');
+  const navigate = useNavigate();
+  const [activeItem, setActiveItem] = useState('hero');
   const [previousItem, setPreviousItem] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Diseño de menú moderno y audaz con iconos más relevantes
   const menuItems = [
-    { id: 'servicios', icon: <Rocket size={24} />, label: 'Servicios' },
-    { id: 'sistemas', icon: <Server size={24} />, label: 'Sistemas' },
-    { id: 'exitos', icon: <Trophy size={24} />, label: 'Casos de Éxito' },
-    { id: 'blog', icon: <BookOpen size={24} />, label: 'Blog' },
-    { id: 'contacto', icon: <PhoneCall size={24} />, label: 'Contacto' }
+    { id: 'hero', icon: <Home size={24} />, label: 'Inicio', path: '/' },
+    { id: 'services', icon: <Rocket size={24} />, label: 'Servicios', path: '/services' },
+    { id: 'systems', icon: <Server size={24} />, label: 'Sistemas', path: '/systems' },
+    { id: 'success-cases', icon: <Trophy size={24} />, label: 'Casos de Éxito', path: '/success-cases' },
+    { id: 'blog', icon: <BookOpen size={24} />, label: 'Comunidad', path: '/blog' },
+    { id: 'contact', icon: <PhoneCall size={24} />, label: 'Contacto', path: '/contact' },
+    { id: 'about', icon: <UserRound size={24} />, label: 'Quienes somos', path: '/about' },
+    { id: 'faq', icon: <HelpCircle size={24} />, label: 'FAQ', path: '/faq' }
   ];
 
-  const handleItemClick = (id) => {
+
+
+  const handleItemClick = (id, path) => {
     if (id !== activeItem && !isAnimating) {
       setPreviousItem(activeItem);
       setActiveItem(id);
       setIsAnimating(true);
+      navigate(path);
     }
   };
 
@@ -45,7 +52,7 @@ const MenuMovil = () => {
             key={item.id}
             className={`relative flex flex-col items-center justify-center w-1/5 py-2 transition-all duration-300 ease-in-out
               ${activeItem === item.id ? 'transform -translate-y-3' : ''}`}
-            onClick={() => handleItemClick(item.id)}
+            onClick={() => handleItemClick(item.id, item.path)}
           >
             {/* Glow effect for active item */}
             {activeItem === item.id && (
