@@ -1,4 +1,3 @@
-import './App.css';
 import { Outlet } from 'react-router-dom';
 import { ReactNode } from 'react';
 
@@ -8,7 +7,7 @@ interface AppNoLayoutProps {
 
 const AppNoLayout = ({ children }: AppNoLayoutProps) => {
   return (
-    <div className="min-h-screen">
+    <div>
       {children || <Outlet />}
     </div>
   );

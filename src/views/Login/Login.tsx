@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../lib/api';
+import { useAuth } from '../../context/AuthContext';
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: '',
   });
   const [error, setError] = useState('');
@@ -13,19 +14,17 @@ const Login = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const loginContainerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  // Efecto visual para la animación inicial y transición cuando termine el video
   useEffect(() => {
     const video = videoRef.current;
     const loginContainer = loginContainerRef.current;
     
-    // Animación inicial para fade-in
     const fadeInTimer = setTimeout(() => {
       loginContainer?.classList.add('opacity-100');
       loginContainer?.classList.remove('opacity-0', 'translate-y-4');
     }, 300);
 
-    // Evento para cuando termine el video, mover al centro
     const handleVideoEnd = () => {
       console.log('Video ended, centering form');
       loginContainer?.classList.add('transition-all', 'duration-1000', 'ease-in-out');
@@ -59,16 +58,18 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      const response = await axios.post<{token: string}>('http://localhost:3001/api/login', {
-        username: formData.username,
+      const response = await api.post<{token: string}>('/login', {
+        email: formData.email,
         password: formData.password
       });
       
-      // Efecto visual para indicar éxito antes de navegar
       document.getElementById('login-form')?.classList.add('scale-95', 'opacity-0');
       
       setTimeout(() => {
-        localStorage.setItem('token', response.data.token);
+        login({ 
+          email: formData.email,
+          name: formData.email.split('@')[0] // Ejemplo de datos de usuario
+        }, response.data.token);
         navigate('/dashboard');
       }, 800);
       
@@ -76,7 +77,6 @@ const Login = () => {
       setError('Credenciales incorrectas. Inténtalo de nuevo.');
       setIsLoading(false);
       
-      // Efecto visual para indicar error
       document.getElementById('login-form')?.classList.add('shake');
       setTimeout(() => {
         document.getElementById('login-form')?.classList.remove('shake');
@@ -86,7 +86,6 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex text-white relative overflow-hidden">
-      {/* Video de fondo */}
       <video 
         ref={videoRef}
         className="absolute top-0 left-0 w-full h-full object-cover"
@@ -98,7 +97,6 @@ const Login = () => {
         Tu navegador no soporta videos HTML5.
       </video>
       
-      {/* Overlay sutil para mejorar el contraste sin oscurecer demasiado el video */}
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-900/10 to-purple-900/10 z-10"></div>
       
       <div 
@@ -106,7 +104,6 @@ const Login = () => {
         id="login-container"
         className="opacity-0 translate-y-4 transition-all duration-500 ease-out transform w-full max-w-md relative z-20 mt-32 ml-16"
       >
-        {/* Elementos decorativos */}
         <div className="absolute -top-20 -left-20 w-40 h-40 bg-blue-600 rounded-full filter blur-3xl opacity-20"></div>
         <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-purple-600 rounded-full filter blur-3xl opacity-20"></div>
         
@@ -126,22 +123,23 @@ const Login = () => {
           
           <form id="login-form" onSubmit={handleSubmit} className="transition-all duration-500">
             <div className="mb-6 group">
-              <label className="block text-white text-sm font-medium mb-2 transition-all duration-300" htmlFor="username">
-                Usuario
+              <label className="block text-white text-sm font-medium mb-2 transition-all duration-300" htmlFor="email">
+                Correo electrónico
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                   </svg>
                 </div>
                 <input
-                  type="text"
-                  id="username"
-                  value={formData.username}
+                  type="email"
+                  id="email"
+                  value={formData.email}
                   onChange={handleChange}
                   className="w-full bg-white bg-opacity-10 text-white px-10 py-3 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                  placeholder="Ingresa tu usuario"
+                  placeholder="Ingresa tu correo electrónico"
                   required
                 />
               </div>

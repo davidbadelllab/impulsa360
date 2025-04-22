@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
+import { dashboardRoutes } from './views/Dashboard/Dashboard';
 import LinkTree from './views/LinkTree/LinkTree';
 import App from './App';
 import AppNoLayout from './AppNoLayout';
@@ -21,11 +22,23 @@ import LegalNotice from './views/LegalNotice';
 import AppsComponent from './components/AppsComponent.jsx';
 import ComponentsSuccessCases from './components/ComponentsSuccessCases.jsx';
 import AgileServices from './components/AgileServices.jsx';
+import ProtectedRoute from './components/Layout/ProtectedRoute';
 
 const router = createBrowserRouter([
   {
     path: '/login',
     element: <AppNoLayout><Login /></AppNoLayout>
+  },
+  {
+    path: '/dashboard',
+    element: (
+      <AppNoLayout>
+        <ProtectedRoute>
+          <Dashboard />
+        </ProtectedRoute>
+      </AppNoLayout>
+    ),
+    children: dashboardRoutes
   },
   {
     path: '/',
@@ -44,10 +57,6 @@ const router = createBrowserRouter([
             <AgileServices/>
           </>
         )
-      },
-      {
-        path: 'dashboard',
-        element: <Dashboard />
       },
       {
         path: 'services',

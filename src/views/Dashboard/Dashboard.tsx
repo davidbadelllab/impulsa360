@@ -1,80 +1,72 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import DashboardLayout from "../../components/Layout/DashboardLayout"
+import { Outlet } from "react-router-dom"
+import DashboardPage from "./DashboardPage"
+import UserPage from "./UserPage"
+import CompanyPage from "./CompanyPage"
+import UtilitiesPage from "./UtilitiesPage"
+import SettingsPage from "./SettingsPage"
+import MessagesPage from "./MessagesPage"
+import AnalyticsPage from "./AnalyticsPage"
+import IntegrationsPage from "./IntegrationsPage"
+import ProfilePage from "./ProfilePage"
+import HelpPage from "./HelpPage"
+import { useAuth } from "../../context/AuthContext"
 
-interface User {
-  id: number;
-  username: string;
-  role: string;
-}
-
-const Dashboard = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          navigate('/login');
-          return;
-        }
-
-        const response = await axios.get<{
-          id: number;
-          username: string;
-          role: string;
-        }>('http://localhost:3001/api/user', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setUser({
-          id: response.data.id,
-          username: response.data.username,
-          role: response.data.role
-        });
-      } catch (error) {
-        localStorage.removeItem('token');
-        navigate('/login');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, [navigate]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
-
-  if (loading) {
-    return <div className="flex justify-center items-center h-screen">Cargando...</div>;
+export default function Dashboard() {
+  const { currentUser } = useAuth();
+  
+  // Definir un objeto de usuario con estructura adecuada para el layout
+  const user = {
+    username: currentUser?.username || "Usuario",
+    role: currentUser?.role || "Usuario"
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="container mx-auto p-4">
-        <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">
-            Bienvenido, {user?.username}
-          </h2>
-          <p className="mb-4">Rol: {user?.role}</p>
-          <button
-            onClick={handleLogout}
-            className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition duration-200"
-          >
-            Cerrar Sesión
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
+    <DashboardLayout user={user}>
+      <Outlet />
+    </DashboardLayout>
+  )
+}
 
-export default Dashboard;
+export const dashboardRoutes = [
+  {
+    path: "",
+    element: <DashboardPage />
+  },
+  {
+    path: "User",
+    element: <UserPage />
+  },
+  {
+    path: "Company",
+    element: <CompanyPage />
+  },
+  {
+    path: "utilities",
+    element: <UtilitiesPage />
+  },
+  {
+    path: "settings",
+    element: <SettingsPage />
+  },
+  {
+    path: "messages",
+    element: <MessagesPage />
+  },
+  {
+    path: "analytics",
+    element: <AnalyticsPage />
+  },
+  {
+    path: "integrations",
+    element: <IntegrationsPage />
+  },
+  {
+    path: "profile",
+    element: <ProfilePage />
+  },
+  {
+    path: "help",
+    element: <HelpPage />
+  }
+]

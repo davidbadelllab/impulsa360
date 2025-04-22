@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowJs": true,
+    "allowImportingTsExtensions": true,
+    "outDir": "./dist",
+    "rootDir": ".",
+    "strict": false
+  },
+  "include": [
+    "server.js",
+    "middlewares/**/*",
+    "controllers/**/*",
+    "routes/**/*",
+    "src/**/*"
+  ],
+  "exclude": ["node_modules"]
+}
