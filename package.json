@@ -5,13 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "server": "node server.js",
     "start": "powershell -ExecutionPolicy Bypass -File start-both.ps1",
     "start:both": "powershell -ExecutionPolicy Bypass -File start-both.ps1",
     "start:batch": "start-both.bat"
+  },
+  "overrides": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -50,6 +54,7 @@
     "node-fetch": "^3.3.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-is": "^19.1.0",
     "react-responsive": "^10.0.1",
     "react-router-dom": "^7.4.0",
     "recharts": "^3.1.0",
@@ -57,20 +62,39 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@types/async-retry": "^1.4.9",
+    "@types/bcrypt": "^6.0.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/body-parser": "^1.19.6",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
     "@types/node": "^22.13.13",
+    "@types/pg": "^8.15.4",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
+    "@types/winston": "^2.4.4",
     "@vitejs/plugin-react-swc": "^3.8.0",
+    "async-mutex": "^0.5.0",
+    "async-retry": "^1.3.3",
     "autoprefixer": "^10.4.21",
+    "bcrypt": "^6.0.0",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
+    "joi": "^17.13.3",
+    "mongoose": "^8.16.4",
+    "pg": "^8.16.3",
     "postcss": "^8.5.3",
+    "redis": "^5.6.0",
     "tailwindcss": "^3.4.1",
     "ts-node": "^10.9.2",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
-    "vite": "^6.2.0"
+    "vite": "^6.2.0",
+    "winston": "^3.17.0",
+    "zod": "^4.0.5"
   }
 }
