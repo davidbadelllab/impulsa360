@@ -3,7 +3,13 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import authRoutes from './routes/authRoutes.js';
+import companyRoutes from './routes/companyRoutes.js';
+import appointmentRoutes from './routes/appointmentRoutes.js';
+import messageRoutes from './routes/messageRoutes.js';
 import userCompanyRoutes from './routes/userCompanyRoutes.js';
+import mediaRoutes from './routes/mediaRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
+import taskRoutes from './routes/taskRoutes.js';
 import { authMiddleware } from './middlewares/authMiddleware.js';
 
 const app = express();
@@ -14,8 +20,8 @@ app.use(bodyParser.json());
 import { createClient } from '@supabase/supabase-js';
 
 // Configuración de Supabase usando la clave anónima pública
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ztyijfstkfzltyhhrnyt.supabase.co';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0eWlqZnN0a2Z6bHR5aGhybnl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU3NTY0NTQsImV4cCI6MjA1MTMzMjQ1NH0.2fYpOdZYnL6kLdqOEGEGHO0lVBTdJCOhQEKLnfgxBVs';
 const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
     persistSession: false
@@ -23,28 +29,48 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 });
 
 // Configuración
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
-// Configurar JWT
-process.env.JWT_SECRET = process.env.SUPABASE_JWT_SECRET;
+// Configurar JWT con fallback más robusto
+const JWT_SECRET = process.env.SUPABASE_JWT_SECRET || process.env.JWT_SECRET || 'fallback_secret_key_2024';
+process.env.JWT_SECRET = JWT_SECRET;
+
+console.log('JWT_SECRET configurado:', JWT_SECRET ? 'Sí' : 'No');
+console.log('Puerto del servidor:', PORT);
 
 // Rutas
 app.use('/api', authRoutes);
-app.use('/api', userCompanyRoutes);
+app.use('/api', userCompanyRoutes); // Monta las rutas de usuarios y otras entidades
+app.use('/api/companies', companyRoutes);
+app.use('/api/appointments', appointmentRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/media', mediaRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/tasks', taskRoutes);
 
 // Endpoint para obtener el usuario actual
 app.get('/api/user', authMiddleware, (req, res) => {
-  // En un entorno real, decodificaríamos el token y obtendríamos 
-  // los datos del usuario desde la base de datos
+  // Obtener los datos reales del usuario desde el token JWT decodificado
+  const user = req.user;
   
-  // Para este ejemplo, retornamos un usuario dummy
   res.json({
-    id: 1,
-    username: 'admin_user',
-    email: 'admin@example.com',
-    role: 'Administrator',
-    is_superadmin: true,
+    id: user.id,
+    username: user.username || user.email?.split('@')[0] || 'Usuario',
+    email: user.email,
+    role: user.role || 'Usuario',
+    is_superadmin: user.is_superadmin || false,
+    role_id: user.role_id,
+    company_id: user.company_id,
     avatar: null
+  });
+});
+
+// Endpoint de prueba para verificar autenticación
+app.get('/api/test-auth', authMiddleware, (req, res) => {
+  console.log('req.user en test-auth:', req.user);
+  res.json({
+    message: 'Autenticación exitosa',
+    user: req.user
   });
 });
 
@@ -81,42 +107,7 @@ app.get('/api/roles', async (req, res) => {
   }
 });
 
-// Endpoints para compañías
-app.get('/api/companies', async (req, res) => {
-  try {
-    const { data, error } = await supabase
-      .from('companies')
-      .select('*');
-    
-    if (error) throw error;
-    
-    res.json({ data });
-  } catch (error) {
-    console.error('Error obteniendo compañías:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Endpoint para actualizar compañías
-app.put('/api/companies/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const updates = req.body;
-    
-    const { data, error } = await supabase
-      .from('companies')
-      .update(updates)
-      .eq('id', id)
-      .select();
-    
-    if (error) throw error;
-    
-    res.json({ data });
-  } catch (error) {
-    console.error('Error actualizando compañía:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
+// Los endpoints de companies están manejados por companyRoutes
 
 // Endpoint para obtener clientes
 app.get('/api/clients', async (req, res) => {

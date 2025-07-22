@@ -24,7 +24,7 @@ const BookingModal = ({ isOpen, onClose }) => {
   const [step, setStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
-  const [selectedType, setSelectedType] = useState(null);
+  const [selectedType, setSelectedType] = useState('video');
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -156,14 +156,55 @@ const BookingModal = ({ isOpen, onClose }) => {
     return date.toDateString() === selectedDate.toDateString();
   };
   
-  const submitBooking = () => {
+  const submitBooking = async () => {
+    // Validar que todos los campos requeridos estén completos
+    if (!formData.name || !formData.email || !selectedDate || !selectedTime || !selectedType) {
+      alert('Por favor, completa todos los campos requeridos: nombre, email, fecha, hora y tipo de cita.');
+      return;
+    }
+
     setLoading(true);
     
-    // Simulación de envío del formulario
-    setTimeout(() => {
+    try {
+      // Preparar los datos para enviar
+      const appointmentData = {
+        name: formData.name,
+        email: formData.email,
+        company: formData.company || '',
+        phone: formData.phone || '',
+        date: selectedDate.toISOString().split('T')[0], // Formato YYYY-MM-DD
+        time: selectedTime,
+        type: selectedType,
+        message: formData.message || ''
+      };
+
+      console.log('Enviando datos:', appointmentData);
+
+      // Enviar datos al backend
+      const response = await fetch('http://localhost:3000/api/appointments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(appointmentData)
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setLoading(false);
+        setStep(4); // Paso de confirmación
+      } else {
+        const errorMessage = result.message || 'Error al crear la cita';
+        console.error('Error del servidor:', errorMessage);
+        throw new Error(errorMessage);
+      }
+    } catch (error) {
+      console.error('Error al enviar la cita:', error);
       setLoading(false);
-      setStep(4); // Paso de confirmación
-    }, 1500);
+      // Mostrar error al usuario
+      alert(`Error al crear la cita: ${error.message}`);
+    }
   };
   
   const renderCalendar = () => {
@@ -405,10 +446,10 @@ const BookingModal = ({ isOpen, onClose }) => {
                 </p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex justify-center w-full">
                 <button
                   onClick={() => setSelectedType('video')}
-                  className={`p-4 rounded-xl border ${
+                  className={`p-4 rounded-xl border w-full ${
                     selectedType === 'video'
                       ? 'bg-gradient-to-br from-blue-900/50 to-blue-800/50 border-blue-600/50'
                       : 'bg-gray-900/50 border-gray-800 hover:bg-gray-800/50'
@@ -428,33 +469,6 @@ const BookingModal = ({ isOpen, onClose }) => {
                         theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                       }`}>
                         Asesoría por Zoom, Teams o Google Meet para una experiencia más personal.
-                      </p>
-                    </div>
-                  </div>
-                </button>
-                
-                <button
-                  onClick={() => setSelectedType('call')}
-                  className={`p-4 rounded-xl border ${
-                    selectedType === 'call'
-                      ? 'bg-gradient-to-br from-blue-900/50 to-blue-800/50 border-blue-600/50'
-                      : 'bg-gray-900/50 border-gray-800 hover:bg-gray-800/50'
-                  } transition-all text-left`}
-                >
-                  <div className="flex items-start">
-                    <div className={`p-3 rounded-full ${
-                      selectedType === 'call' ? 'bg-blue-600/30 text-blue-400' : 'bg-gray-800 text-gray-400'
-                    } transition-colors`}>
-                      <PhoneCall size={24} />
-                    </div>
-                    <div className="ml-4">
-                      <h4 className={`font-medium ${
-                        theme === 'dark' ? 'text-white' : 'text-gray-800'
-                      }`}>Llamada telefónica</h4>
-                      <p className={`text-sm mt-1 ${
-                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                      }`}>
-                        Asesoría mediante llamada telefónica a tu número de contacto.
                       </p>
                     </div>
                   </div>

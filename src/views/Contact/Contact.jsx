@@ -641,7 +641,7 @@ const Contact = () => {
       </div>
       
       {/* Estilos para la animación de partículas */}
-      <style jsx>{`
+              <style>{`
         @keyframes float {
           0% { transform: translateY(0); opacity: 0; }
           10% { opacity: 1; }

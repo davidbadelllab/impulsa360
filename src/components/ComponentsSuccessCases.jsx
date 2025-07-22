@@ -328,7 +328,7 @@ const Testimonials = () => {
       </div>
 
       {/* Estilos para animaciones */}
-      <style jsx>{`
+              <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0) translateX(0); }
           25% { transform: translateY(-15px) translateX(10px); }

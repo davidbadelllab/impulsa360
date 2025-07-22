@@ -1,23 +1,19 @@
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { NavLink } from "react-router-dom"
 import {
-  BarChart,
-  Bell,
-  Calendar,
   ChevronDown,
   Clock,
-  FileText,
   LayoutDashboard,
   MessageSquare,
-  Settings,
   User2,
   Zap,
-  Menu,
   ArrowLeft,
   ArrowRight,
   Plus,
   Sparkles,
-  Building
+  Building,
+  HardDrive,
+  CheckSquare
 } from "lucide-react"
 import { Button } from "../ui/button"
 import { motion, AnimatePresence } from "framer-motion"
@@ -41,11 +37,10 @@ export default function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarP
     { path: "/dashboard", icon: <LayoutDashboard />, label: "Dashboard" },
     { path: "/dashboard/User", icon: <User2 />, label: "Users" },
     { path: "/dashboard/Company", icon: <Building />, label: "Company" },
-    { path: "/dashboard/utilities", icon: <Zap />, label: "Utilities" },
-    { path: "/dashboard/settings", icon: <Settings />, label: "Settings" },
-    { path: "/dashboard/messages", icon: <MessageSquare />, label: "Messages", badge: 1 },
-    { path: "/dashboard/analytics", icon: <BarChart />, label: "Analytics" },
-    { path: "/dashboard/integrations", icon: <FileText />, label: "Integrations" },
+    { path: "/dashboard/utilities", icon: <Zap />, label: "Booking" },
+    { path: "/dashboard/tasks", icon: <CheckSquare />, label: "Tasks" },
+    { path: "/dashboard/messages", icon: <MessageSquare />, label: "Messages" },
+    { path: "/dashboard/media", icon: <HardDrive />, label: "Media" },
   ]
 
   return (
@@ -142,19 +137,42 @@ export default function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarP
             </AnimatePresence>
 
             {/* Badge with improved styling */}
-            {item.badge && (
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <motion.div
-                  whileHover={{ scale: 1.2 }}
-                  whileTap={{ scale: 0.9 }}
-                  className={`${activeLink.includes(item.path) ? "bg-purple-600" : "bg-indigo-400"} text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg border border-white/20`}
-                >
-                  {item.badge}
-                </motion.div>
-              </div>
-            )}
           </NavLink>
         ))}
+
+        {/* Sección de administración */}
+        <div className="mt-8 mb-2 text-xs font-bold text-indigo-200 uppercase tracking-wider pl-2">Administración</div>
+        <NavLink
+          to="/dashboard/plans"
+          className={({ isActive }) => `
+            group relative flex items-center px-3 py-2.5 rounded-xl transition-all duration-300
+            ${isActive 
+              ? "bg-gradient-to-r from-white/90 to-white/80 text-purple-800 font-medium shadow-xl border border-white/40" 
+              : "text-white hover:bg-white/10 border border-transparent"
+            }
+          `}
+        >
+          <motion.div 
+            whileHover={{ scale: 1.15, rotate: 5 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            className="w-5 h-5 flex items-center justify-center text-purple-100"
+          >
+            <HardDrive />
+          </motion.div>
+          <AnimatePresence>
+            {isOpen && (
+              <motion.span
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="ml-3 text-xs font-medium tracking-wide text-purple-100"
+              >
+                Planes
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </NavLink>
       </nav>
 
       {/* Quick Action Button */}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import api from '../../lib/api';
 import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
@@ -30,7 +30,8 @@ import {
   Eye,
   Building,
   ShieldAlert,
-  X
+  X,
+  Key
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -81,6 +82,7 @@ interface User {
   id: number;
   username: string;
   email: string;
+  password?: string; // Solo para creación de usuarios
   role_id: number;
   company_id: number;
   is_superadmin: boolean;
@@ -326,12 +328,13 @@ export default function UserPage() {
   };
 
   const handleEdit = (user: User) => {
-    setCurrentUser(user);
+    // Limpiar el campo de contraseña para la edición por seguridad
+    setCurrentUser({ ...user, password: '' });
     setOpenDialog(true);
   };
 
   const handleCreate = () => {
-    setCurrentUser({});
+    setCurrentUser({ password: '' });
     setOpenDialog(true);
   };
 
@@ -339,14 +342,21 @@ export default function UserPage() {
     try {
       if (currentUser.id) {
         // Actualizar usuario existente
-        const { data } = await api.put<{data: User}>(`/users/${currentUser.id}`, {
+        const updateData: any = {
           username: currentUser.username,
           email: currentUser.email,
           role_id: currentUser.role_id,
           company_id: currentUser.company_id,
           is_superadmin: currentUser.is_superadmin,
           status: currentUser.status
-        });
+        };
+        
+        // Solo incluir contraseña si se ha proporcionado una nueva
+        if (currentUser.password && currentUser.password.trim() !== '') {
+          updateData.password = currentUser.password;
+        }
+        
+        const { data } = await api.put<{data: User}>(`/users/${currentUser.id}`, updateData);
         
         setUsers(users.map(user => 
           user.id === currentUser.id ? {
@@ -365,7 +375,7 @@ export default function UserPage() {
         const { data } = await api.post<{data: User}>('/users', {
           username: currentUser.username,
           email: currentUser.email,
-          password: 'TempPassword123!', // Contraseña temporal
+          password: currentUser.password || 'TempPassword123!', // Usar contraseña del formulario o temporal
           role_id: currentUser.role_id,
           company_id: currentUser.company_id,
           is_superadmin: currentUser.is_superadmin || false,
@@ -1042,6 +1052,33 @@ export default function UserPage() {
                 </div>
               </div>
               
+              {/* Campo de contraseña - Para usuarios nuevos y existentes */}
+              <div className="grid grid-cols-1 gap-5">
+                <div className="group relative">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500 to-orange-500 rounded-lg blur opacity-30 group-hover:opacity-100 transition duration-200"></div>
+                  <div className="relative bg-white dark:bg-slate-800 rounded-lg p-5">
+                    <label htmlFor="password" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                      <Key className="h-4 w-4 inline mr-2" />
+                      {currentUser.id ? 'Nueva Contraseña' : 'Contraseña Inicial'}
+                    </label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={currentUser.password || ''}
+                      onChange={(e) => setCurrentUser({...currentUser, password: e.target.value})}
+                      placeholder={currentUser.id ? 'Dejar vacío para mantener la actual' : 'Mínimo 8 caracteres'}
+                      className="h-11 font-medium border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-red-500"
+                    />
+                    <p className="text-xs text-slate-500 mt-2">
+                      {currentUser.id 
+                        ? 'Solo completa este campo si deseas cambiar la contraseña del usuario.' 
+                        : 'Esta contraseña será temporal. El usuario puede cambiarla después del primer inicio de sesión.'
+                      }
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="group relative">
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg blur opacity-30 group-hover:opacity-100 transition duration-200"></div>
@@ -1190,7 +1227,13 @@ export default function UserPage() {
             </Button>
             <Button 
               onClick={handleSave}
-              disabled={!currentUser.username || !currentUser.email || !currentUser.role_id || !currentUser.company_id}
+              disabled={
+                !currentUser.username || 
+                !currentUser.email || 
+                !currentUser.role_id || 
+                !currentUser.company_id ||
+                (!currentUser.id && !currentUser.password) // Requiere contraseña solo para usuarios nuevos
+              }
               className="w-full sm:w-auto order-1 sm:order-2 bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900 text-white shadow-lg shadow-indigo-500/20"
             >
               {currentUser.id ? (

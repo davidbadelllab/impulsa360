@@ -23,7 +23,7 @@ const Header = () => {
       const token = localStorage.getItem('token');
       if (token) {
         try {
-          const response = await axios.get('http://localhost:3001/api/user', {
+          const response = await axios.get('http://localhost:3000/api/user', {
             headers: { Authorization: `Bearer ${token}` }
           });
           setIsAuthenticated(true);

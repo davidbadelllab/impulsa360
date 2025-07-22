@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import Company, { ICompany } from '../models/Company';
+import CompanyPlan from '../models/CompanyPlan';
+import Plan from '../models/Plan';
 import { handleError } from '../utils/errorHandler';
 
 // Interfaz para las consultas de paginación
@@ -37,11 +39,14 @@ let companies: ICompany[] = [
 ];
 
 // Obtener todas las compañías
-export const getAllCompanies = (req: Request, res: Response): void => {
+export const getAllCompanies = async (req: Request, res: Response): Promise<void> => {
   try {
+    const companies = await Company.find({ isActive: true }).sort({ name: 1 });
+    
     res.status(200).json({
       success: true,
-      count: companies.length
+      count: companies.length,
+      data: companies
     });
   } catch (error) {
     handleError(res, error);
@@ -75,6 +80,21 @@ export const createCompany = async (req: Request, res: Response): Promise<void> 
     }
     
     const company = await Company.create(companyData);
+
+    // Asignar todos los planes activos a la nueva empresa
+    const activePlans = await Plan.find({ is_active: true });
+    const now = new Date();
+    const assignments = activePlans.map(plan => ({
+      company: company._id,
+      plan: plan._id,
+      start_date: now,
+      payment_due_date: now,
+      payment_status: 'pendiente',
+    }));
+    if (assignments.length > 0) {
+      await CompanyPlan.insertMany(assignments);
+    }
+
     res.status(201).json({ success: true, data: company });
   } catch (error) {
     handleError(res, error);

@@ -4,6 +4,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import authRoutes from './routes/authRoutes.js';
 import userCompanyRoutes from './routes/companyRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
 import { authMiddleware } from './middlewares/authMiddleware.js';
 import { createClient } from '@supabase/supabase-js';
 
@@ -37,7 +38,7 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 });
 
 // Configuración
-const PORT: string | number = process.env.PORT || 3001;
+const PORT: string | number = process.env.PORT || 3000
 
 // Configurar JWT
 process.env.JWT_SECRET = process.env.SUPABASE_JWT_SECRET;
@@ -45,6 +46,7 @@ process.env.JWT_SECRET = process.env.SUPABASE_JWT_SECRET;
 // Rutas
 app.use('/api', authRoutes);
 app.use('/api', userCompanyRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Endpoint para obtener el usuario actual
 app.get('/api/user', authMiddleware, (req: Request, res: Response<User>) => {

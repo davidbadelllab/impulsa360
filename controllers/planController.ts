@@ -1,59 +1,59 @@
-const db = require('../lib/db');
+import { Request, Response } from 'express';
+import Plan from '../models/Plan';
 
 const PlanController = {
-  async createPlan(req, res) {
+  // Crear un plan
+  async createPlan(req: Request, res: Response) {
     try {
-      const { name, description, status, company_id, team_id } = req.body;
-      const created_by = req.user.id;
-      
-      const plan = await db('plans')
-        .insert({
-          name,
-          description,
-          status,
-          created_by,
-          company_id,
-          team_id
-        })
-        .returning('*');
-        
-      res.status(201).json(plan[0]);
-    } catch (error) {
+      const plan = await Plan.create(req.body);
+      res.status(201).json(plan);
+    } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   },
 
-  async getPlansByCompany(req, res) {
+  // Listar todos los planes
+  async getAllPlans(req: Request, res: Response) {
     try {
-      const plans = await db('plans')
-        .where({ company_id: req.params.company_id })
-        .orderBy('created_at', 'desc');
+      const plans = await Plan.find().sort({ name: 1 });
       res.json(plans);
-    } catch (error) {
+    } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   },
 
-  async updatePlanStatus(req, res) {
+  // Obtener un plan por ID
+  async getPlanById(req: Request, res: Response) {
     try {
-      const updated = await db('plans')
-        .where({ id: req.params.id })
-        .update({ status: req.body.status })
-        .returning('*');
-      res.json(updated[0]);
-    } catch (error) {
+      const plan = await Plan.findById(req.params.id);
+      if (!plan) return res.status(404).json({ error: 'Plan no encontrado' });
+      res.json(plan);
+    } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   },
 
-  async deletePlan(req, res) {
+  // Actualizar un plan
+  async updatePlan(req: Request, res: Response) {
     try {
-      await db('plans').where({ id: req.params.id }).del();
-      res.json({ message: 'Plan deleted' });
-    } catch (error) {
+      const plan = await Plan.findByIdAndUpdate(req.params.id, req.body, { new: true });
+      if (!plan) return res.status(404).json({ error: 'Plan no encontrado' });
+      res.json(plan);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  // Eliminar un plan
+  async deletePlan(req: Request, res: Response) {
+    try {
+      const plan = await Plan.findByIdAndDelete(req.params.id);
+      if (!plan) return res.status(404).json({ error: 'Plan no encontrado' });
+      res.json({ message: 'Plan eliminado' });
+    } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   }
 };
 
-module.exports = PlanController;
+export default PlanController;

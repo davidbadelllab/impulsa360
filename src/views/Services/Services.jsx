@@ -219,7 +219,7 @@ const Systems = () => {
       </div>
 
       {/* Agregar estilos para animación de meteoros */}
-      <style jsx>{`
+              <style>{`
         @keyframes meteor {
           0% {
             transform: translateY(-200px) translateX(0) rotate(0deg);
