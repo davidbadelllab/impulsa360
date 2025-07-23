@@ -9,9 +9,10 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "server": "node server.js",
-    "start": "powershell -ExecutionPolicy Bypass -File start-both.ps1",
-    "start:both": "powershell -ExecutionPolicy Bypass -File start-both.ps1",
-    "start:batch": "start-both.bat"
+    "start": "chmod +x start-both.sh && ./start-both.sh",
+    "start:both": "chmod +x start-both.sh && ./start-both.sh",
+    "start:bash": "./start-both.sh",
+    "heroku-postbuild": "npm run build"
   },
   "overrides": {
     "react": "^18.3.1",
