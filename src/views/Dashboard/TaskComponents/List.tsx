@@ -17,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../../components/ui/dialog';
+import api from '../../../lib/api';
 import { useDroppable } from '@dnd-kit/core';
 import TaskCard from './TaskCard';
 
@@ -136,24 +137,12 @@ export default function List({ list, boardLabels, onUpdate, onCreateCard }: List
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/tasks/lists/${list.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          name: editedName.trim()
-        })
+      await api.put(`/tasks/lists/${list.id}`, {
+        name: editedName.trim()
       });
 
-      if (response.ok) {
-        onUpdate();
-        setIsEditing(false);
-      } else {
-        console.error('Error updating list');
-        setEditedName(list.name);
-      }
+      onUpdate();
+      setIsEditing(false);
     } catch (error) {
       console.error('Error updating list:', error);
       setEditedName(list.name);
@@ -165,19 +154,10 @@ export default function List({ list, boardLabels, onUpdate, onCreateCard }: List
   const handleDeleteList = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/tasks/lists/${list.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (response.ok) {
-        onUpdate();
-        setShowDeleteDialog(false);
-      } else {
-        console.error('Error deleting list');
-      }
+      await api.delete(`/tasks/lists/${list.id}`);
+      
+      onUpdate();
+      setShowDeleteDialog(false);
     } catch (error) {
       console.error('Error deleting list:', error);
     } finally {

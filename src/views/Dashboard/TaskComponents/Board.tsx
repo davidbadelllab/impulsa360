@@ -16,6 +16,7 @@ import List from './List';
 import CreateListModal from './CreateListModal';
 import CreateCardModal from './CreateCardModal';
 import TaskCard from './TaskCard';
+import api from '../../../lib/api';
 
 interface Board {
   id: number;
@@ -201,28 +202,12 @@ export default function Board({ board, onBack, onBoardUpdate }: BoardProps) {
         });
         
         try {
-          const response = await fetch('http://localhost:3000/api/tasks/cards/move', {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({
-              cardId,
-              newListId,
-              newPosition
-            })
+          const result = await api.put('/tasks/cards/move', {
+            cardId,
+            newListId,
+            newPosition
           });
           
-          console.log('Response status:', response.status);
-          
-          if (!response.ok) {
-            const errorData = await response.json();
-            console.error('Server error:', errorData);
-            throw new Error(`HTTP ${response.status}: ${errorData.error || 'Unknown error'}`);
-          }
-          
-          const result = await response.json();
           console.log('Card moved successfully:', result);
           onBoardUpdate();
         } catch (error) {
@@ -242,23 +227,14 @@ export default function Board({ board, onBack, onBoardUpdate }: BoardProps) {
 
   const handleCreateList = async (listData: { name: string }) => {
     try {
-      const response = await fetch('http://localhost:3000/api/tasks/lists', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          ...listData,
-          board_id: board.id,
-          position: sortedLists.length
-        })
+      await api.post('/tasks/lists', {
+        ...listData,
+        board_id: board.id,
+        position: sortedLists.length
       });
 
-      if (response.ok) {
-        onBoardUpdate();
-        setShowCreateListModal(false);
-      }
+      onBoardUpdate();
+      setShowCreateListModal(false);
     } catch (error) {
       console.error('Error creating list:', error);
     }
@@ -268,35 +244,18 @@ export default function Board({ board, onBack, onBoardUpdate }: BoardProps) {
     if (!selectedListId) return;
 
     try {
-      const response = await fetch('http://localhost:3000/api/tasks/cards', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          ...cardData,
-          list_id: selectedListId,
-          position: board.lists?.find(l => l.id === selectedListId)?.cards?.length || 0
-        })
+      const newCard = await api.post('/tasks/cards', {
+        ...cardData,
+        list_id: selectedListId,
+        position: board.lists?.find(l => l.id === selectedListId)?.cards?.length || 0
       });
-
-      if (response.ok) {
-        const newCard = await response.json();
         
         // Si hay etiquetas seleccionadas, asignarlas a la tarjeta
         if (cardData.labels && cardData.labels.length > 0) {
           for (const labelId of cardData.labels) {
-            await fetch('http://localhost:3000/api/tasks/card-labels', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-              },
-              body: JSON.stringify({
-                card_id: newCard.id,
-                label_id: labelId
-              })
+            await api.post('/tasks/card-labels', {
+              card_id: newCard.id,
+              label_id: labelId
             });
           }
         }
@@ -304,16 +263,9 @@ export default function Board({ board, onBack, onBoardUpdate }: BoardProps) {
         // Si hay usuarios asignados, asignarlos a la tarjeta
         if (cardData.assignedUsers && cardData.assignedUsers.length > 0) {
           for (const userId of cardData.assignedUsers) {
-            await fetch('http://localhost:3000/api/tasks/assignments', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-              },
-              body: JSON.stringify({
-                card_id: newCard.id,
-                user_id: userId
-              })
+            await api.post('/tasks/assignments', {
+              card_id: newCard.id,
+              user_id: userId
             });
           }
         }
@@ -321,7 +273,6 @@ export default function Board({ board, onBack, onBoardUpdate }: BoardProps) {
         onBoardUpdate();
         setShowCreateCardModal(false);
         setSelectedListId(null);
-      }
     } catch (error) {
       console.error('Error creating card:', error);
     }

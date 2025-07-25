@@ -6,6 +6,7 @@ import { Textarea } from '../../../components/ui/textarea';
 import { Badge } from '../../../components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar';
 import { Label } from '../../../components/ui/label';
+import { api } from '../../../lib/api';
 
 interface Card {
   id: number;
@@ -178,22 +179,13 @@ export default function CardDetailModal({ card, onUpdate, onClose }: CardDetailM
     try {
       await new Promise(resolve => setTimeout(resolve, 1500)); // Efecto dramático
       
-      const response = await fetch(`http://localhost:3000/api/tasks/cards/${card.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          title: editedTitle,
-          description: editedDescription
-        })
+      const response = await api.put(`/tasks/cards/${card.id}`, {
+        title: editedTitle,
+        description: editedDescription
       });
 
-      if (response.ok) {
-        onUpdate();
-        setIsEditing(false);
-      }
+      onUpdate();
+      setIsEditing(false);
     } catch (error) {
       console.error('Error updating card:', error);
     } finally {
@@ -208,27 +200,18 @@ export default function CardDetailModal({ card, onUpdate, onClose }: CardDetailM
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:3000/api/tasks/comments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          content: newComment,
-          card_id: card.id
-        })
+      const response = await api.post('/tasks/comments', {
+        content: newComment,
+        card_id: card.id
       });
 
-      if (response.ok) {
-        setNewComment('');
-        onUpdate();
-        // Efecto de éxito
-        controls.start({
-          scale: [1, 1.02, 1],
-          transition: { duration: 0.3 }
-        });
-      }
+      setNewComment('');
+      onUpdate();
+      // Efecto de éxito
+      controls.start({
+        scale: [1, 1.02, 1],
+        transition: { duration: 0.3 }
+      });
     } catch (error) {
       console.error('Error adding comment:', error);
     } finally {

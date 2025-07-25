@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../compo
 import { Label } from '../../../components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar';
 import { cn } from '../../../lib/utils';
+import { api } from '../../../lib/api';
 
 interface CreateCardModalProps {
   onCreateCard: (cardData: { title: string; description?: string; due_date?: string; labels?: number[]; assignedUsers?: number[] }) => void;
@@ -49,16 +50,8 @@ export default function CreateCardModal({ onCreateCard, onClose, boardLabels, op
   const fetchUsers = async () => {
     setLoadingUsers(true);
     try {
-      const response = await fetch('http://localhost:3000/api/tasks/users', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      
-      if (response.ok) {
-        const userData = await response.json();
-        setUsers(userData);
-      }
+      const response = await api.get('/tasks/users');
+      setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
