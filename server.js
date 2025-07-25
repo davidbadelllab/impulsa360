@@ -54,22 +54,7 @@ app.use('/api/media', mediaRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/tasks', taskRoutes);
 
-// Endpoint para obtener el usuario actual
-app.get('/api/user', authMiddleware, (req, res) => {
-  // Obtener los datos reales del usuario desde el token JWT decodificado
-  const user = req.user;
-  
-  res.json({
-    id: user.id,
-    username: user.username || user.email?.split('@')[0] || 'Usuario',
-    email: user.email,
-    role: user.role || 'Usuario',
-    is_superadmin: user.is_superadmin || false,
-    role_id: user.role_id,
-    company_id: user.company_id,
-    avatar: null
-  });
-});
+// Endpoint para obtener el usuario actual está manejado por authRoutes
 
 // Endpoint de prueba para verificar autenticación
 app.get('/api/test-auth', authMiddleware, (req, res) => {

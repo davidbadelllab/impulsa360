@@ -22,7 +22,19 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/user', authController.authenticateToken, (req, res) => {
-  res.json(req.user);
+  // Obtener los datos reales del usuario desde el token JWT decodificado
+  const user = req.user;
+  
+  res.json({
+    id: user.id,
+    username: user.username || user.email?.split('@')[0] || 'Usuario',
+    email: user.email,
+    role: user.role || 'Usuario',
+    is_superadmin: user.is_superadmin || false,
+    role_id: user.role_id,
+    company_id: user.company_id,
+    avatar: null
+  });
 });
 
 export default router;
