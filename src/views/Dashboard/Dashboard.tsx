@@ -15,6 +15,7 @@ import ProfilePage from "./ProfilePage"
 import HelpPage from "./HelpPage"
 import PlansPage from './PlansPage';
 import CompanyPlansPage from './CompanyPlansPage';
+import VideoConferencePage from './VideoConferencePage';
 import { useAuth } from "../../context/AuthContext"
 
 export default function Dashboard() {
@@ -89,5 +90,9 @@ export const dashboardRoutes = [
   {
     path: 'companies/:companyId/plans',
     element: <CompanyPlansPage />
+  },
+  {
+    path: 'videoconference',
+    element: <VideoConferencePage />
   },
 ]

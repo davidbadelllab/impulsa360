@@ -41,16 +41,7 @@ const router = createBrowserRouter([
     ),
     children: dashboardRoutes
   },
-  {
-    path: '/videoconference',
-    element: (
-      <AppNoLayout>
-        <ProtectedRoute>
-          <VideoConferencePage />
-        </ProtectedRoute>
-      </AppNoLayout>
-    )
-  },
+
   {
     path: '/',
     element: <App />,
