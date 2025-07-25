@@ -293,8 +293,7 @@ export default function MessagesPage() {
     if (!selectedConversation) return;
     
     try {
-      const response = await fetch(`http://localhost:3000/api/messages/typing/${selectedConversation.id}?userId=${currentUserId}`);
-      const result = await response.json();
+      const result = await api.get(`/messages/typing/${selectedConversation.id}?userId=${currentUserId}`);
       
       if (result.success) {
         setTypingUsers(result.data);
@@ -306,8 +305,7 @@ export default function MessagesPage() {
 
   const fetchConversations = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/messages/conversations?userId=${currentUserId}`);
-      const result = await response.json();
+      const result = await api.get(`/messages/conversations?userId=${currentUserId}`);
       
       if (result.success) {
         setConversations(result.data);
@@ -321,8 +319,7 @@ export default function MessagesPage() {
 
   const fetchMessages = async (conversationId: number, shouldScroll: boolean = true) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/messages/conversations/${conversationId}/messages`);
-      const result = await response.json();
+      const result = await api.get(`/messages/conversations/${conversationId}/messages`);
       
       if (result.success) {
         const newMessages = result.data;
@@ -355,8 +352,7 @@ export default function MessagesPage() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/messages/stats?userId=${currentUserId}`);
-      const result = await response.json();
+      const result = await api.get(`/messages/stats?userId=${currentUserId}`);
       
       if (result.success) {
         setStats(result.data);
@@ -368,8 +364,7 @@ export default function MessagesPage() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/messages/users?currentUserId=${currentUserId}`);
-      const result = await response.json();
+      const result = await api.get(`/messages/users?currentUserId=${currentUserId}`);
       
       if (result.success) {
         setUsers(result.data);
@@ -381,18 +376,10 @@ export default function MessagesPage() {
 
   const startConversation = async (targetUserId: number) => {
     try {
-      const response = await fetch('http://localhost:3000/api/messages/conversations/direct', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          currentUserId,
-          targetUserId
-        })
+      const result = await api.post('/messages/conversations/direct', {
+        currentUserId,
+        targetUserId
       });
-
-      const result = await response.json();
       
       if (result.success) {
         setSelectedConversation(result.data);
@@ -419,20 +406,12 @@ export default function MessagesPage() {
 
     setSending(true);
     try {
-      const response = await fetch('http://localhost:3000/api/messages/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          conversationId: selectedConversation.id,
-          senderId: currentUserId,
-          content: newMessage.trim(),
-          type: 'text'
-        })
+      const result = await api.post('/messages/messages', {
+        conversationId: selectedConversation.id,
+        senderId: currentUserId,
+        content: newMessage.trim(),
+        type: 'text'
       });
-
-      const result = await response.json();
       
       if (result.success) {
         setNewMessage('');
@@ -449,12 +428,8 @@ export default function MessagesPage() {
 
   const markAsRead = async (conversationId: number) => {
     try {
-      await fetch(`http://localhost:3000/api/messages/conversations/${conversationId}/read`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: currentUserId })
+      await api.put(`/messages/conversations/${conversationId}/read`, {
+        userId: currentUserId
       });
       
       fetchConversations(); // Actualizar contadores
@@ -467,15 +442,9 @@ export default function MessagesPage() {
     if (!confirm('¿Estás seguro de que deseas eliminar este mensaje?')) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/api/messages/messages/${messageId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: currentUserId })
+      const result = await api.delete(`/messages/messages/${messageId}`, {
+        userId: currentUserId
       });
-
-      const result = await response.json();
       
       if (result.success && selectedConversation) {
         fetchMessages(selectedConversation.id);
