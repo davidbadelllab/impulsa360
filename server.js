@@ -17,6 +17,7 @@ import mediaRoutes from './routes/mediaRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import { authMiddleware } from './middlewares/authMiddleware.js';
+import { listRoutes } from './debug-routes.js';
 
 const app = express();
 app.use(cors());
@@ -55,6 +56,28 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/tasks', taskRoutes);
 
 // Endpoint para obtener el usuario actual está manejado por authRoutes
+
+// Endpoint de login directo como respaldo (en caso de problemas con authRoutes)
+app.post('/api/login', async (req, res) => {
+  try {
+    console.log('🔐 Login directo attempt:', req.body);
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email y contraseña son requeridos' });
+    }
+    
+    // Importar dinámicamente el controlador
+    const authController = await import('./controllers/authController.js');
+    const { token } = await authController.login(email, password);
+    
+    console.log('🔐 Login directo successful for:', email);
+    res.json({ token });
+  } catch (error) {
+    console.error('🔐 Login directo error:', error.message);
+    res.status(401).json({ error: error.message });
+  }
+});
 
 // Endpoint de prueba para verificar autenticación
 app.get('/api/test-auth', authMiddleware, (req, res) => {
@@ -207,9 +230,20 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
+// Diagnóstico de rutas en desarrollo
+if (process.env.NODE_ENV !== 'production') {
+  listRoutes(app);
+}
+
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
   console.log('Configuración Supabase:');
   console.log(`- URL: ${process.env.SUPABASE_URL || 'No configurada'}`);
+  
+  // Mostrar rutas importantes en producción
+  console.log('\n🔗 Rutas críticas registradas:');
+  console.log('POST /api/login - Autenticación');
+  console.log('GET  /api/user - Usuario actual');
+  console.log('GET  /api/users - Lista usuarios');
 });
