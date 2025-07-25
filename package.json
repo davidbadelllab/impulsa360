@@ -14,7 +14,6 @@
     "start:dev": "concurrently \"npm run dev\" \"npm run dev:server\"",
     "start:prod": "npm run build && npm run server",
     "seed:users": "node seeders/createTestUsers.js",
-    "postinstall": "npm run build",
     "heroku-postbuild": "npm run build",
     "dokploy:setup": "npm run seed:users || true"
   },
