@@ -9,11 +9,11 @@ Configura estas variables de entorno en tu panel de Dokploy:
 ### Variables Requeridas
 
 1. **NEXT_PUBLIC_API_BASE_URL**
-   - Valor: `https://tu-dominio.com/api` (reemplaza `tu-dominio.com` con tu dominio real)
+   - Valor: `https://www.impulsa360.tech/api`
    - Descripción: URL base para las llamadas a la API desde el frontend
 
 2. **API_BASE_URL**
-   - Valor: `https://tu-dominio.com/api` (reemplaza `tu-dominio.com` con tu dominio real)
+   - Valor: `https://www.impulsa360.tech/api`
    - Descripción: URL base para las llamadas a la API desde el servidor
 
 3. **NODE_ENV**
@@ -35,10 +35,9 @@ Configura estas variables de entorno en tu panel de Dokploy:
 
 1. Ve a tu aplicación en el panel de Dokploy
 2. Navega a la sección "Environment Variables" o "Variables de Entorno"
-3. Agrega las variables mencionadas arriba
-4. **IMPORTANTE**: Reemplaza `tu-dominio.com` con la URL real de tu aplicación
-5. Guarda los cambios
-6. Redeploya la aplicación
+3. Agrega las variables mencionadas arriba (usa exactamente los valores mostrados)
+4. Guarda los cambios
+5. Redeploya la aplicación
 
 ## Verificación
 
