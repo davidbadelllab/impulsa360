@@ -522,7 +522,7 @@ export default function CardDetailModal({ card, onUpdate, onClose }: CardDetailM
                         <Avatar className="w-8 h-8 border-2 border-cyan-400 shadow-lg shadow-cyan-400/20">
                           <AvatarImage src="" />
                           <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-xs">
-                            {assignment.user.username.charAt(0).toUpperCase()}
+                            {assignment.user?.username?.charAt(0).toUpperCase() || 'U'}
                           </AvatarFallback>
                         </Avatar>
                       </motion.div>
@@ -611,13 +611,13 @@ export default function CardDetailModal({ card, onUpdate, onClose }: CardDetailM
                         <Avatar className="w-8 h-8 border border-cyan-400 shadow-lg shadow-cyan-400/20">
                           <AvatarImage src="" />
                           <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs">
-                            {comment.user.username.charAt(0).toUpperCase()}
+                            {comment.user?.username?.charAt(0).toUpperCase() || 'U'}
                           </AvatarFallback>
                         </Avatar>
                       </motion.div>
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
-                          <span className="text-sm font-medium text-cyan-400">{comment.user.username}</span>
+                          <span className="text-sm font-medium text-cyan-400">{comment.user?.username || 'Usuario desconocido'}</span>
                           <span className="text-xs text-gray-400">
                             {new Date(comment.created_at).toLocaleDateString()}
                           </span>

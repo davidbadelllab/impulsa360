@@ -390,7 +390,7 @@ export class UserRepository {
     try {
       const query = `
         UPDATE ${this.table}
-        SET deleted_at = NOW(), is_active = false
+        SET deleted_at = NOW(), updated_at = NOW()
         WHERE id = ANY($1)
         AND deleted_at IS NULL
         RETURNING id
@@ -414,10 +414,10 @@ export class UserRepository {
     try {
       const query = `
         UPDATE ${this.table}
-        SET is_active = true, updated_at = NOW()
+        SET updated_at = NOW()
         WHERE id = ANY($1)
         AND deleted_at IS NULL
-        RETURNING id, username, email, is_active
+        RETURNING id, username, email
       `;
       
       const result = await this.pool.query(query, [userIds]);
@@ -438,10 +438,10 @@ export class UserRepository {
     try {
       const query = `
         UPDATE ${this.table}
-        SET is_active = false, updated_at = NOW()
+        SET deleted_at = NOW(), updated_at = NOW()
         WHERE id = ANY($1)
         AND deleted_at IS NULL
-        RETURNING id, username, email, is_active
+        RETURNING id, username, email
       `;
       
       const result = await this.pool.query(query, [userIds]);
