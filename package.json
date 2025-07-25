@@ -53,6 +53,7 @@
     "framer-motion": "^12.5.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.483.0",
+    "mediasoup": "^3.16.8",
     "multer": "^2.0.1",
     "next-intl": "^4.0.2",
     "node-fetch": "^3.3.2",
@@ -62,7 +63,12 @@
     "react-responsive": "^10.0.1",
     "react-router-dom": "^7.4.0",
     "recharts": "^3.1.0",
-    "tailwind-merge": "^3.3.1"
+    "simple-peer": "^9.11.1",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
+    "tailwind-merge": "^3.3.1",
+    "uuid": "^11.1.0",
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
@@ -78,6 +84,8 @@
     "@types/pg": "^8.15.4",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
+    "@types/socket.io": "^3.0.1",
+    "@types/uuid": "^10.0.0",
     "@types/winston": "^2.4.4",
     "@vitejs/plugin-react-swc": "^3.8.0",
     "async-mutex": "^0.5.0",

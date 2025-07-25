@@ -2,11 +2,15 @@ import 'dotenv/config';
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import { createServer } from 'http';
+import { Server as SocketIOServer } from 'socket.io';
 import authRoutes from './routes/authRoutes.js';
 import userCompanyRoutes from './routes/companyRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
+import meetingRoutes from './routes/meetingRoutes.js';
 import { authMiddleware } from './middlewares/authMiddleware.js';
 import { createClient } from '@supabase/supabase-js';
+import SocketService from './services/socketService.js';
 
 // Definición de tipos
 interface User {
@@ -25,8 +29,24 @@ interface Company {
 }
 
 const app: Express = express();
+const server = createServer(app);
+
+// Configurar Socket.IO
+const io = new SocketIOServer(server, {
+  cors: {
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    methods: ["GET", "POST"]
+  }
+});
+
 app.use(cors());
 app.use(bodyParser.json());
+
+// Hacer io disponible en req
+app.use((req: Request, res: Response, next) => {
+  (req as any).io = io;
+  next();
+});
 
 // Configuración de Supabase
 const supabaseUrl: string = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -47,6 +67,7 @@ process.env.JWT_SECRET = process.env.SUPABASE_JWT_SECRET;
 app.use('/api', authRoutes);
 app.use('/api', userCompanyRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/meetings', meetingRoutes);
 
 // Endpoint para obtener el usuario actual
 app.get('/api/user', authMiddleware, (req: Request, res: Response<User>) => {
@@ -209,9 +230,13 @@ app.get('/api/plans', async (req: Request, res: Response) => {
   }
 });
 
+// Inicializar servicio de sockets
+new SocketService(io);
+
 // Iniciar servidor
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log('Socket.IO configurado para videoconferencias');
   console.log('Configuración Supabase:');
   console.log(`- URL: ${process.env.SUPABASE_URL || 'No configurada'}`);
 });

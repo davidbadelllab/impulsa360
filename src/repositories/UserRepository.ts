@@ -271,29 +271,48 @@ export class UserRepository {
     const { hardDelete = false, deleted_by = null, deleted_at = new Date() } = options;
     
     try {
+      logger.info(`Intentando eliminar usuario ${id}, hardDelete: ${hardDelete}`);
+      
       let query;
       let params;
       
       if (hardDelete) {
         query = `DELETE FROM ${this.table} WHERE id = $1 RETURNING id`;
         params = [id];
+        logger.info(`Ejecutando eliminación física para usuario ${id}`);
       } else {
+        // Solo soft delete con deleted_at y deleted_by, removiendo is_active
         query = `
           UPDATE ${this.table}
-          SET deleted_at = $1, deleted_by = $2, is_active = false
+          SET deleted_at = $1, deleted_by = $2, updated_at = NOW()
           WHERE id = $3 AND deleted_at IS NULL
           RETURNING id
         `;
         params = [deleted_at, deleted_by, id];
+        logger.info(`Ejecutando soft delete para usuario ${id}`);
       }
       
+      logger.info(`Query a ejecutar: ${query}`);
+      logger.info(`Parámetros: ${JSON.stringify(params)}`);
+      
       const result = await this.pool.query(query, params);
-      return result.rows.length > 0;
+      const success = result.rows.length > 0;
+      
+      logger.info(`Resultado de eliminación para usuario ${id}: ${success ? 'exitoso' : 'no encontrado'}`);
+      return success;
     } catch (error: unknown) {
       if (error instanceof Error) {
-        logger.error(`Error en UserRepository.delete(${id}):`, error);
+        logger.error(`Error en UserRepository.delete(${id}):`, {
+          message: error.message,
+          stack: error.stack,
+          name: error.name,
+          // @ts-ignore - Acceder a propiedades específicas de error de base de datos
+          code: error.code,
+          detail: error.detail,
+          hint: error.hint
+        });
       }
-      throw new DatabaseError(`Error al eliminar usuario con ID ${id}`);
+      throw new DatabaseError(`Error al eliminar usuario con ID ${id}: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   }
 

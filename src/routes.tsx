@@ -23,6 +23,7 @@ import AppsComponent from './components/AppsComponent.jsx';
 import ComponentsSuccessCases from './components/ComponentsSuccessCases.jsx';
 import AgileServices from './components/AgileServices.jsx';
 import ProtectedRoute from './components/Layout/ProtectedRoute';
+import VideoConferencePage from './views/Dashboard/VideoConferencePage';
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,16 @@ const router = createBrowserRouter([
       </AppNoLayout>
     ),
     children: dashboardRoutes
+  },
+  {
+    path: '/videoconference',
+    element: (
+      <AppNoLayout>
+        <ProtectedRoute>
+          <VideoConferencePage />
+        </ProtectedRoute>
+      </AppNoLayout>
+    )
   },
   {
     path: '/',
