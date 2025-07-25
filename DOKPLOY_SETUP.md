@@ -4,7 +4,7 @@
 Tu aplicación está mostrando errores `ERR_CONNECTION_REFUSED` porque está intentando conectarse a `localhost:3000` en lugar de usar la URL correcta del servidor desplegado en Dokploy.
 
 ## Solución
-Configura estas variables de entorno en tu panel de Dokploy:
+La aplicación ahora detectará automáticamente la URL correcta, pero para mayor control, configura estas variables de entorno en tu panel de Dokploy:
 
 ### Variables Requeridas
 
@@ -33,11 +33,23 @@ Configura estas variables de entorno en tu panel de Dokploy:
 
 ## Pasos para configurar en Dokploy
 
+### Opción 1: Detección Automática (Recomendado)
+La aplicación ahora detecta automáticamente la URL correcta basada en el dominio desde donde se accede. Solo necesitas redesplegar la aplicación.
+
+### Opción 2: Configuración Manual
+Si prefieres especificar manualmente las URLs:
+
 1. Ve a tu aplicación en el panel de Dokploy
 2. Navega a la sección "Environment Variables" o "Variables de Entorno"
-3. Agrega las variables mencionadas arriba (usa exactamente los valores mostrados)
+3. Agrega la variable `NEXT_PUBLIC_API_BASE_URL` con valor `https://www.impulsa360.tech/api`
 4. Guarda los cambios
 5. Redeploya la aplicación
+
+### Verificación del Fix
+Después del deployment, abre las herramientas de desarrollador en tu navegador y revisa la consola. Deberías ver un mensaje como:
+```
+🔧 API Base URL configurada: https://www.impulsa360.tech/api
+```
 
 ## Verificación
 

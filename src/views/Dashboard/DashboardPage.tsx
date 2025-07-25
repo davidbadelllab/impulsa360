@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, Legend, ResponsiveContainer } from 'recharts';
 import { Users, Building, Calendar, FolderOpen, TrendingUp, BarChart3 } from 'lucide-react';
-import axios from 'axios';
+import api from '../../lib/api';
 
 interface AppointmentStatus {
   [status: string]: number;
@@ -29,7 +29,7 @@ export default function DashboardPage() {
   useEffect(() => {
     console.log('🔍 Iniciando peticiones al dashboard...');
     // Usuarios
-    axios.get('http://localhost:3000/api/dashboard/users-count')
+    api.get('/dashboard/users-count')
       .then(res => {
         console.log('👥 Usuarios response:', res.data);
         setUsers(res.data.total || 0);
@@ -39,7 +39,7 @@ export default function DashboardPage() {
         setUsers(0);
       });
     // Empresas
-    axios.get('http://localhost:3000/api/dashboard/companies-count')
+    api.get('/dashboard/companies-count')
       .then(res => {
         console.log('🏢 Empresas response:', res.data);
         setCompanies(res.data.total || 0);
@@ -49,7 +49,7 @@ export default function DashboardPage() {
         setCompanies(0);
       });
     // Citas
-    axios.get('http://localhost:3000/api/dashboard/appointments-stats')
+    api.get('/dashboard/appointments-stats')
       .then(res => {
         console.log('📅 Citas response:', res.data);
         setAppointments(res.data.total || 0);
@@ -61,7 +61,7 @@ export default function DashboardPage() {
         setAppointmentsStatus({});
       });
     // Archivos
-    axios.get('http://localhost:3000/api/dashboard/files-stats')
+    api.get('/dashboard/files-stats')
       .then(res => {
         console.log('📁 Archivos response:', res.data);
         setFilesByUser(res.data.filesByUser || {});

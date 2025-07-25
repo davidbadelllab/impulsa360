@@ -24,6 +24,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar'
 import EmojiPicker from '../../components/EmojiPicker';
 import FileUpload from '../../components/FileUpload';
 import { useAuth } from '../../context/AuthContext';
+import api from '../../lib/api';
 
 interface Conversation {
   id: number;
@@ -240,16 +241,10 @@ export default function MessagesPage() {
     if (!selectedConversation) return;
     
     try {
-      await fetch('http://localhost:3000/api/messages/typing', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          conversationId: selectedConversation.id,
-          userId: currentUserId,
-          typing
-        })
+      await api.post('/messages/typing', {
+        conversationId: selectedConversation.id,
+        userId: currentUserId,
+        typing
       });
     } catch (error) {
       console.error('Error sending typing status:', error);
