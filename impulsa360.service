@@ -1,0 +1,23 @@
+[Unit]
+Description=Impulsa360 Web Application
+Documentation=https://github.com/tu-usuario/impulsa360
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/impulsa360
+Environment=NODE_ENV=production
+Environment=PORT=3000
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=10
+KillMode=mixed
+KillSignal=SIGINT
+TimeoutSec=60
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=impulsa360
+
+[Install]
+WantedBy=multi-user.target

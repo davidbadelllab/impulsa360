@@ -7,7 +7,14 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+// Configuración de Supabase
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ztyijfstkfzltyhhrnyt.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+console.log('🔧 MediaController - Configuración Supabase:');
+console.log('URL:', supabaseUrl);
+console.log('Key configurada:', supabaseKey ? 'Sí' : 'No');
 
 // Configuración de multer para subida de archivos
 const storage = multer.diskStorage({
@@ -440,17 +447,27 @@ const getUsersForSharing = async (req, res) => {
     const userId = req.user.id;
     const companyId = req.user.company_id;
     
-    // Obtener usuarios de la misma empresa, excluyendo el usuario actual
-    const { data: users, error } = await supabase
+    console.log('getUsersForSharing - userId:', userId, 'companyId:', companyId);
+    
+    let query = supabase
       .from('users')
-      .select('id, username, email')
-      .eq('company_id', companyId)
+      .select('id, username, email, company_id')
       .neq('id', userId);
     
+    // Si el usuario tiene company_id, filtrar por la misma empresa
+    // Si no, mostrar todos los usuarios (excepto el actual)
+    if (companyId) {
+      query = query.eq('company_id', companyId);
+    }
+    
+    const { data: users, error } = await query;
+    
     if (error) {
+      console.error('Error en query users:', error);
       return res.status(500).json({ error: 'Error obteniendo usuarios' });
     }
     
+    console.log('Usuarios encontrados:', users?.length || 0);
     res.json(users || []);
     
   } catch (error) {

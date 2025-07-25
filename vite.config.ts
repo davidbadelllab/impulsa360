@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react-swc'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000,
+    port: 5173,
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
@@ -16,6 +16,9 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 2000, // Aumenta el límite a 2000kb
+    outDir: 'dist',
+    emptyOutDir: true,
   },
-  assetsInclude: ['**/*.glb']
+  assetsInclude: ['**/*.glb'],
+  base: '/'
 })

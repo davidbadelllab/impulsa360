@@ -1,0 +1,77 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Development files
+.next/
+dist/
+build/
+
+# Environment files
+.env.local
+.env.development.local
+.env.test.local
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Temporary folders
+tmp/
+temp/
+uploads/
+
+# Test files
+test/
+tests/
+__tests__/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+
+# Archives
+*.tar.gz
+*.zip
+
+# Database
+*.sqlite
+*.db
+
+# Docker files (ya no se usan)
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Deployment files for other platforms
+vercel.json
+netlify.toml
+railway.toml
+heroku.yml
+now.json
+
+# Scripts específicos de desarrollo
+install-vps.sh
+start-both.*
+
+# Directorios temporales
+temp/
+.temp/

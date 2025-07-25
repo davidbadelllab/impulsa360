@@ -1,9 +1,28 @@
 import axios from 'axios';
 
-// Cambiamos la URL base para que coincida con el backend real
-// Corregimos la URL para que apunte al puerto correcto (3001)
+// Configuración dinámica de la URL base para diferentes entornos
+const getBaseURL = () => {
+  if (typeof window === 'undefined') {
+    // Server-side rendering
+    return 'http://localhost:3000/api';
+  }
+  
+  // Client-side: usar la URL actual del navegador
+  const protocol = window.location.protocol;
+  const hostname = window.location.hostname;
+  const port = window.location.port;
+  
+  // En desarrollo local
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return `${protocol}//${hostname}:3000/api`;
+  }
+  
+  // En producción: usar la misma URL del frontend
+  return port ? `${protocol}//${hostname}:${port}/api` : `${protocol}//${hostname}/api`;
+};
+
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api', // Modificamos el puerto para que coincida con server.js
+  baseURL: getBaseURL(),
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'

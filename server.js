@@ -2,6 +2,12 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Para obtener __dirname en módulos ES
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import authRoutes from './routes/authRoutes.js';
 import companyRoutes from './routes/companyRoutes.js';
 import appointmentRoutes from './routes/appointmentRoutes.js';
@@ -41,7 +47,7 @@ console.log('Puerto del servidor:', PORT);
 // Rutas
 app.use('/api', authRoutes);
 app.use('/api', userCompanyRoutes); // Monta las rutas de usuarios y otras entidades
-app.use('/api/companies', companyRoutes);
+app.use('/api', companyRoutes); // Este archivo maneja /plans
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/media', mediaRoutes);
@@ -107,7 +113,21 @@ app.get('/api/roles', async (req, res) => {
   }
 });
 
-// Los endpoints de companies están manejados por companyRoutes
+// Endpoint para obtener companies
+app.get('/api/companies', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('companies')
+      .select('*');
+    
+    if (error) throw error;
+    
+    res.json({ data });
+  } catch (error) {
+    console.error('Error obteniendo companies:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // Endpoint para obtener clientes
 app.get('/api/clients', async (req, res) => {
@@ -187,6 +207,19 @@ app.get('/api/plans', async (req, res) => {
     console.error('Error obteniendo planes:', error);
     res.status(500).json({ error: error.message });
   }
+});
+
+// Servir archivos estáticos del build de React
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// Manejar todas las rutas no-API (SPA routing)
+app.get('*', (req, res) => {
+  // No servir index.html para rutas de API
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 // Iniciar servidor

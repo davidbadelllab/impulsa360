@@ -1,0 +1,26 @@
+{
+  "name": "impulsa360",
+  "type": "app",
+  "buildType": "nodejs",
+  "buildCommand": "npm run build",
+  "startCommand": "npm start",
+  "port": 3000,
+  "environment": {
+    "NODE_ENV": "production",
+    "PORT": "3000"
+  },
+  "requiredEnvVars": [
+    "NEXT_PUBLIC_SUPABASE_URL",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "JWT_SECRET"
+  ],
+  "healthCheck": {
+    "path": "/api/users",
+    "timeout": 30
+  },
+  "resources": {
+    "memory": "512Mi",
+    "cpu": "500m"
+  }
+}
