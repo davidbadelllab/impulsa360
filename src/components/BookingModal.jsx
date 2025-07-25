@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import api from '../lib/api';
 import { 
   Calendar, 
   Clock, 
@@ -180,22 +181,14 @@ const BookingModal = ({ isOpen, onClose }) => {
 
       console.log('Enviando datos:', appointmentData);
 
-      // Enviar datos al backend
-      const response = await fetch('http://localhost:3000/api/appointments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(appointmentData)
-      });
+      // Enviar datos al backend usando la configuración de API
+      const response = await api.post('/appointments', appointmentData);
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
+      if (response.status < 400 && response.data.success) {
         setLoading(false);
         setStep(4); // Paso de confirmación
       } else {
-        const errorMessage = result.message || 'Error al crear la cita';
+        const errorMessage = response.data.message || 'Error al crear la cita';
         console.error('Error del servidor:', errorMessage);
         throw new Error(errorMessage);
       }

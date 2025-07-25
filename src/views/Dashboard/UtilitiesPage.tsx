@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import { Select } from "../../components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
+import api from '../../lib/api';
 import { 
   Calendar, 
   Clock, 
@@ -72,13 +72,12 @@ export default function UtilitiesPage() {
 
   const fetchAppointments = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/appointments');
-      const result = await response.json();
+      const response = await api.get('/appointments');
       
-      if (result.success) {
-        setAppointments(result.data);
+      if (response.data.success) {
+        setAppointments(response.data.data);
       } else {
-        console.error('Error fetching appointments:', result.message);
+        console.error('Error fetching appointments:', response.data.message);
       }
     } catch (error) {
       console.error('Error fetching appointments:', error);
@@ -89,11 +88,10 @@ export default function UtilitiesPage() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/appointments/stats');
-      const result = await response.json();
+      const response = await api.get('/appointments/stats');
       
-      if (result.success) {
-        setStats(result.data);
+      if (response.data.success) {
+        setStats(response.data.data);
       }
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -102,17 +100,9 @@ export default function UtilitiesPage() {
 
   const updateAppointmentStatus = async (id: number, newStatus: string) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/appointments/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: newStatus })
-      });
-
-      const result = await response.json();
+      const response = await api.put(`/appointments/${id}`, { status: newStatus });
       
-      if (result.success) {
+      if (response.data.success) {
         fetchAppointments();
         fetchStats();
       } else {
@@ -130,13 +120,9 @@ export default function UtilitiesPage() {
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/api/appointments/${id}`, {
-        method: 'DELETE'
-      });
-
-      const result = await response.json();
+      const response = await api.delete(`/appointments/${id}`);
       
-      if (result.success) {
+      if (response.data.success) {
         fetchAppointments();
         fetchStats();
       } else {
