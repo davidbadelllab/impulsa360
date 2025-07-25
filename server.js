@@ -220,20 +220,27 @@ app.get('/api/plans', async (req, res) => {
 // Servir archivos estáticos del build de React
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// Manejar todas las rutas no-API (SPA routing)
-app.get('*', (req, res) => {
-  // No servir index.html para rutas de API
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).json({ error: 'API endpoint not found' });
-  }
-  
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+// Catch-all para APIs no encontradas (DEBE ir antes del SPA routing)
+app.all('/api/*', (req, res) => {
+  console.log(`❌ API endpoint no encontrado: ${req.method} ${req.path}`);
+  res.status(404).json({ 
+    error: 'API endpoint not found',
+    method: req.method,
+    path: req.path,
+    message: 'Esta ruta de API no existe'
+  });
 });
 
 // Diagnóstico de rutas en desarrollo
 if (process.env.NODE_ENV !== 'production') {
   listRoutes(app);
 }
+
+// SPA routing (DEBE ir AL FINAL para no interceptar APIs)
+app.get('*', (req, res) => {
+  console.log(`🔄 SPA routing serving: ${req.path}`);
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
 // Iniciar servidor
 app.listen(PORT, () => {
