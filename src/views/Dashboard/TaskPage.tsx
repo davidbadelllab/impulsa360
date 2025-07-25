@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../lib/api';
 import { Plus, MoreHorizontal, Search, Filter, Calendar, Users } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -124,11 +124,7 @@ export default function TaskPage() {
 
   const fetchBoards = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/tasks/boards', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      const response = await api.get('/tasks/boards');
       setBoards(response.data);
     } catch (error) {
       console.error('Error fetching boards:', error);
@@ -139,11 +135,7 @@ export default function TaskPage() {
 
   const handleCreateBoard = async (boardData: { name: string; description?: string }) => {
     try {
-      const response = await axios.post('http://localhost:3000/api/tasks/boards', boardData, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      const response = await api.post('/tasks/boards', boardData);
       setBoards([response.data, ...boards]);
       setShowCreateModal(false);
     } catch (error) {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Folder, Loader2, Sparkles, Building2 } from 'lucide-react';
-import axios from 'axios';
+import { api } from '../../../lib/api';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Textarea } from '../../../components/ui/textarea';
@@ -31,13 +31,8 @@ export default function CreateBoardModal({ onCreateBoard, onClose }: CreateBoard
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        // Usar axios para manejar mejor los encabezados y la respuesta
-        const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3000/api/companies', {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : ''
-          }
-        });
+        // Usar el cliente API centralizado que maneja automáticamente la URL base y autenticación
+        const response = await api.get('/companies');
         
         // Verificar la estructura de la respuesta y extraer los datos de las empresas
         const responseData = response.data as any;
