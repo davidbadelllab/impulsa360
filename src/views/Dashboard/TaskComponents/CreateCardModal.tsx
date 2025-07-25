@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../compo
 import { Label } from '../../../components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar';
 import { cn } from '../../../lib/utils';
-import { api } from '../../../lib/api';
+import api from '../../../lib/api';
 
 interface CreateCardModalProps {
   onCreateCard: (cardData: { title: string; description?: string; due_date?: string; labels?: number[]; assignedUsers?: number[] }) => void;

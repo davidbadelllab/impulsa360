@@ -6,7 +6,7 @@ import { Textarea } from '../../../components/ui/textarea';
 import { Badge } from '../../../components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar';
 import { Label } from '../../../components/ui/label';
-import { api } from '../../../lib/api';
+import api from '../../../lib/api';
 
 interface Card {
   id: number;
