@@ -63,7 +63,7 @@ const BlogCreateEdit = () => {
   const [authorsLoading, setAuthorsLoading] = useState(true);
 
   // API base URL with proper environment variable handling
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
   const [availableTags] = useState([
     'Marketing', 'Digital', 'SEO', 'Seguridad', 'Tecnología', 'IA', 'E-commerce', 'Innovación'
