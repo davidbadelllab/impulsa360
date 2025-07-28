@@ -16,6 +16,7 @@ import userCompanyRoutes from './routes/userCompanyRoutes.js';
 import mediaRoutes from './routes/mediaRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
+import blogRoutes from './routes/blogRoutes.js';
 import { authMiddleware } from './middlewares/authMiddleware.js';
 import { listRoutes } from './debug-routes.js';
 
@@ -54,6 +55,7 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/blog', blogRoutes);
 
 // Endpoint para obtener el usuario actual está manejado por authRoutes
 
