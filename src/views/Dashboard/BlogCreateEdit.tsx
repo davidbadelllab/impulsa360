@@ -78,10 +78,14 @@ const BlogCreateEdit = () => {
         const categoriesResponse = await fetch('/api/blog/categories');
         if (categoriesResponse.ok) {
           const categoriesData = await categoriesResponse.json();
+          console.log('Categories fetched:', categoriesData);
           setCategories(categoriesData);
-          // Set default category if creating new article
+          // Set default category if creating new article and no category is set
           if (!isEdit && categoriesData.length > 0 && !formData.category_id) {
-            handleInputChange('category_id', categoriesData[0].id);
+            setFormData(prev => ({
+              ...prev,
+              category_id: categoriesData[0].id
+            }));
           }
         }
         setCategoriesLoading(false);
@@ -90,10 +94,14 @@ const BlogCreateEdit = () => {
         const authorsResponse = await fetch('/api/blog/authors');
         if (authorsResponse.ok) {
           const authorsData = await authorsResponse.json();
+          console.log('Authors fetched:', authorsData);
           setAuthors(authorsData);
-          // Set default author if creating new article
+          // Set default author if creating new article and no author is set
           if (!isEdit && authorsData.length > 0 && !formData.author_id) {
-            handleInputChange('author_id', authorsData[0].id);
+            setFormData(prev => ({
+              ...prev,
+              author_id: authorsData[0].id
+            }));
           }
         }
         setAuthorsLoading(false);
@@ -105,7 +113,7 @@ const BlogCreateEdit = () => {
     };
 
     fetchCategoriesAndAuthors();
-  }, [isEdit, formData.category_id, formData.author_id]);
+  }, [isEdit]); // Remove formData dependencies to avoid infinite loop
 
   useEffect(() => {
     if (isEdit && id) {
