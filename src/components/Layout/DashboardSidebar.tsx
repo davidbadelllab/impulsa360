@@ -89,7 +89,7 @@ export default function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarP
 
       {/* Navigation with improved styling */}
       <nav className="flex-1 px-4 py-5 space-y-2 overflow-y-auto custom-scrollbar">
-        {navItems.map((item) => (
+                {navItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
@@ -102,38 +102,11 @@ export default function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarP
             `}
             onMouseEnter={() => setHoveredLink(item.path)}
             onMouseLeave={() => setHoveredLink(null)}
-            onClick={() => setActiveLink(item.path)}
+            onClick={() => {
+              console.log('Sidebar navigation clicked:', item.path);
+              setActiveLink(item.path);
+            }}
           >
-            {/* Animated background for hover effect */}
-            {hoveredLink === item.path && !activeLink.includes(item.path) && (
-              <motion.div 
-                layoutId="hoverBg"
-                className="absolute inset-0 bg-white/10 rounded-xl border border-white/10"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              />
-            )}
-
-            {/* Icon with improved animation */}
-            <motion.div 
-              whileHover={{ scale: 1.15, rotate: 5 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              className={`w-5 h-5 flex items-center justify-center ${activeLink.includes(item.path) ? "text-purple-700" : "text-purple-100"}`}
-            >
-              {item.icon}
-            </motion.div>
-
-            {/* Label with conditional rendering based on sidebar state */}
-            <AnimatePresence>
-              {isOpen && (
-                <motion.span
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
-                  className={`ml-3 text-xs font-medium tracking-wide ${activeLink.includes(item.path) ? "text-purple-800" : "text-purple-100"}`}
                 >
                   {item.label}
                 </motion.span>

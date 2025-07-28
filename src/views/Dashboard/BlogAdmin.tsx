@@ -29,6 +29,8 @@ interface Article {
 }
 
 const BlogAdmin = () => {
+  console.log('BlogAdmin component loaded - Dashboard Blog Administration');
+  
   const [articles, setArticles] = useState<Article[]>([
     {
       id: 1,
