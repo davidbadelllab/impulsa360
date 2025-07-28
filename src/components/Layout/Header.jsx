@@ -82,9 +82,9 @@ const Header = () => {
                 { path: '/services', labelEs: 'Servicios', labelEn: 'Services' },
                 { path: '/blog', labelEs: 'Blog', labelEn: 'Blog' },
                 { path: '/success-cases', labelEs: 'Exito', labelEn: 'Success Cases' },
-                { path: '/about', labelEs: 'About Us', labelEn: 'About Us' },
+                { path: '/about', labelEs: 'Nosotros', labelEn: 'About Us' },
                 { path: '/faq', labelEs: 'FAQ', labelEn: 'FAQ' },
-                { path: '/contact', labelEs: 'Contact', labelEn: 'Contact' }
+                { path: '/contact', labelEs: 'Contacto', labelEn: 'Contact' }
               ].map((item) => (
                 <Link 
                   key={item.path}
@@ -104,15 +104,15 @@ const Header = () => {
             </nav>
 
             {/* Botones y Controles */}
-            <div className="flex items-center space-x-8">
+            <div className="flex items-center space-x-8 ml-12">
               {/* Botón de Agenda */}
               <button
                 onClick={() => setShowBookingModal(true)}
-                className={`group relative bg-slate-900 h-12 w-48 border-2 border-teal-600 text-white text-base font-bold rounded-xl overflow-hidden transform transition-all duration-500 hover:scale-105 hover:border-emerald-400 hover:text-emerald-300 px-4 flex items-center gap-2 before:absolute before:w-8 before:h-8 before:content[''] before:right-1 before:top-1 before:z-10 before:bg-indigo-500 before:rounded-full before:blur-lg before:transition-all before:duration-500 after:absolute after:z-10 after:w-12 after:h-12 after:content[''] after:bg-teal-400 after:right-3 after:top-2 after:rounded-full after:blur-lg after:transition-all after:duration-500 hover:before:right-8 hover:before:-bottom-2 hover:before:blur hover:after:-right-3 hover:after:scale-110 ${
+                className={`group relative bg-slate-900 h-12 w-24 border-2 border-teal-600 text-white text-sm font-bold rounded-xl overflow-hidden transform transition-all duration-500 hover:scale-105 hover:border-emerald-400 hover:text-emerald-300 px-3 flex items-center gap-1 before:absolute before:w-8 before:h-8 before:content[''] before:right-1 before:top-1 before:z-10 before:bg-indigo-500 before:rounded-full before:blur-lg before:transition-all before:duration-500 after:absolute after:z-10 after:w-12 after:h-12 after:content[''] after:bg-teal-400 after:right-3 after:top-2 after:rounded-full after:blur-lg after:transition-all after:duration-500 hover:before:right-8 hover:before:-bottom-2 hover:before:blur hover:after:-right-3 hover:after:scale-110 ${
                   isDark ? '' : 'bg-slate-800'
                 }`}
               >
-                <CalendarIcon className="h-5 w-5 z-20" />
+                <CalendarIcon className="h-5 w-3 z-20" />
                 <span className="z-20">{language === 'es' ? 'Agenda' : 'Book'}</span>
               </button>
 

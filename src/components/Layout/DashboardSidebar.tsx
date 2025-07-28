@@ -14,7 +14,8 @@ import {
   Building,
   HardDrive,
   CheckSquare,
-  Video
+  Video,
+  BookOpen
 } from "lucide-react"
 import { Button } from "../ui/button"
 import { motion, AnimatePresence } from "framer-motion"
@@ -42,6 +43,7 @@ export default function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarP
     { path: "/dashboard/tasks", icon: <CheckSquare />, label: "Tasks" },
     { path: "/dashboard/messages", icon: <MessageSquare />, label: "Messages" },
     { path: "/dashboard/media", icon: <HardDrive />, label: "Media" },
+    { path: "/dashboard/blog", icon: <BookOpen />, label: "Blog" },
     { path: "/dashboard/videoconference", icon: <Video />, label: "Videoconferencias" },
   ]
 

@@ -137,7 +137,7 @@ const AppsComponent = () => {
                 theme === 'dark' 
                   ? 'bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500' 
                   : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600'
-              }`}>Aplicaciones Inteligentes para tu Negocio</span>
+              }`}>Aplicaciones inteligentes para tu negocio</span>
             </span>
           </h2>
           

@@ -139,8 +139,8 @@ const AgileServices = () => {
                   ? 'from-blue-400 via-indigo-400 to-purple-500' 
                   : 'from-blue-600 via-indigo-600 to-purple-600'
               }`}>
-                Transforma tu Negocio con <br />
-                Servicios Agile y Scrum
+                Transforma tu negocio con <br />
+                servicios agile y scrum
               </span>
             </span>
           </h2>
@@ -212,7 +212,7 @@ const AgileServices = () => {
             <h3 className={`text-2xl font-bold mb-8 text-center ${
               theme === 'dark' ? 'text-white' : 'text-gray-900'
             }`}>
-              Nuestro Proceso Agile
+              Nuestro proceso agiles con metodo scrum
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">

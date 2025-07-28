@@ -153,7 +153,7 @@ const Testimonials = () => {
                 ? 'from-blue-400 via-indigo-400 to-purple-500' 
                 : 'from-blue-600 via-indigo-600 to-purple-600'
             }`}>
-              Lo Que Dicen Nuestros Clientes
+              Lo que dicen nuestros clientes
             </span>
           </h2>
           

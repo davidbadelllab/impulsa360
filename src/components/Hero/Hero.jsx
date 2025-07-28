@@ -104,7 +104,7 @@ const Hero = () => {
     <section 
       ref={heroRef}
       id="inicio"
-      className={`relative min-h-screen overflow-hidden py-32 lg:py-0 flex items-center ${
+      className={`relative min-h-[calc(100vh-8rem)] lg:min-h-screen overflow-hidden pt-32 pb-16 lg:pt-32 lg:pb-0 flex items-center ${
         theme === 'dark' 
           ? 'bg-gradient-to-b from-gray-950 via-blue-950 to-gray-950' 
           : 'bg-gradient-to-b from-gray-50 via-blue-50 to-gray-50'
@@ -154,7 +154,7 @@ const Hero = () => {
       <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-blue-500/50 to-transparent opacity-70"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
-        <div className="flex flex-col lg:flex-row items-center gap-12 lg:min-h-screen">
+        <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12 lg:min-h-screen">
           {/* Contenido de texto con animaciones avanzadas */}
           <div className={`lg:w-1/2 transition-all duration-1000 transform ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-12 opacity-0'}`}>
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-blue-600/20 to-purple-600/20 text-blue-300 border border-blue-500/20 backdrop-blur-md mb-8 animate-pulse-slow">
@@ -162,31 +162,42 @@ const Hero = () => {
               <span className="text-sm font-medium">Innovación Tecnológica Disruptiva</span>
             </div>
             
-            <h1 className={`text-5xl md:text-6xl xl:text-7xl font-bold mb-8 ${theme === 'dark' ? 'text-white' : 'text-black'} leading-tight tracking-tight`}>
+            <h1 className={`text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold mb-6 lg:mb-8 ${theme === 'dark' ? 'text-white' : 'text-black'} leading-tight tracking-tight`}>
               <div className="overflow-hidden">
                 <span className="block transform transition-transform duration-1000 delay-200" style={{ transform: isVisible ? 'translateY(0)' : 'translateY(100%)' }}>
                   Revoluciona tu
                 </span>
               </div>
-              <div className="overflow-hidden">
+              <div className="overflow-hidden" style={{ lineHeight: '1.15', minHeight: '3.5rem' }}>
                 <span className="block transform transition-transform duration-1000 delay-400" style={{ transform: isVisible ? 'translateY(0)' : 'translateY(100%)' }}>
-                  <span className="relative">
-                    <span className={`bg-clip-text text-transparent inline-block ${
-                      theme === 'dark' 
-                        ? 'bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500' 
-                        : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600'
-                    }`}>presencia digital</span>
-                    <span className={`absolute -bottom-2 left-0 right-0 h-1 transform scale-x-0 transition-transform duration-1000 delay-1000 origin-left ${
-                      theme === 'dark' 
-                        ? 'bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500' 
-                        : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600'
-                    }`} style={{ transform: isVisible ? 'scaleX(1)' : 'scaleX(0)' }}></span>
+                  <span className="relative inline-block" style={{ minHeight: '3.2rem', display: 'inline-flex', alignItems: 'center' }}>
+                    <span
+                      className={`bg-clip-text text-transparent align-middle ${
+                        theme === 'dark'
+                          ? 'bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500'
+                          : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600'
+                      }`}
+                      style={{ fontSize: 'inherit', lineHeight: '1.15', paddingBottom: '0.1em', display: 'inline-block' }}
+                    >
+                      presencia digital
+                    </span>
+                    <span
+                      className={`absolute -bottom-2 left-0 right-0 h-1 transform scale-x-0 transition-transform duration-1000 delay-1000 origin-left ${
+                        theme === 'dark'
+                          ? 'bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500'
+                          : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600'
+                      }`}
+                      style={{
+                        transform: isVisible ? 'scaleX(1)' : 'scaleX(0)',
+                        minHeight: '0.25rem'
+                      }}
+                    ></span>
                   </span>
                 </span>
               </div>
             </h1>
             
-            <p className={`text-xl mb-10 max-w-xl transform transition-all duration-1000 delay-700 ${
+            <p className={`text-lg sm:text-xl mb-8 lg:mb-10 max-w-xl transform transition-all duration-1000 delay-700 ${
               theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
             }`} style={{ opacity: isVisible ? 1 : 0, transform: isVisible ? 'translateY(0)' : 'translateY(20px)' }}>
               Despliega todo el potencial de tu empresa con soluciones digitales de vanguardia. Estrategias basadas en inteligencia artificial y análisis predictivo para un crecimiento exponencial.
@@ -201,11 +212,11 @@ const Hero = () => {
             </div>
             
             {/* Tarjetas de estadísticas con efecto hover */}
-            <div className="mt-16 grid grid-cols-3 gap-4 transform transition-all duration-1000 delay-1000" style={{ opacity: isVisible ? 1 : 0, transform: isVisible ? 'translateY(0)' : 'translateY(30px)' }}>
+            <div className="mt-12 lg:mt-16 grid grid-cols-3 gap-3 lg:gap-4 transform transition-all duration-1000 delay-1000" style={{ opacity: isVisible ? 1 : 0, transform: isVisible ? 'translateY(0)' : 'translateY(30px)' }}>
               {stats.map((stat, index) => (
                 <div 
                   key={index}
-                  className={`relative overflow-hidden ${theme === 'dark' ? 'bg-gray-900/40' : 'bg-white/70'} backdrop-blur-md rounded-xl p-4 ${theme === 'dark' ? 'border border-white/10' : 'border border-gray-200'} group transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
+                  className={`relative overflow-hidden ${theme === 'dark' ? 'bg-gray-900/40' : 'bg-white/70'} backdrop-blur-md rounded-xl p-3 lg:p-4 ${theme === 'dark' ? 'border border-white/10' : 'border border-gray-200'} group transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
                   onMouseEnter={() => setHoverStat(index)}
                   onMouseLeave={() => setHoverStat(null)}
                 >
@@ -215,8 +226,8 @@ const Hero = () => {
                     <div className={`rounded-full p-2 mb-2 bg-gradient-to-r ${stat.color} bg-opacity-20 transition-transform duration-500 ${hoverStat === index ? 'scale-110' : ''}`}>
                       {stat.icon}
                     </div>
-                    <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'} mb-1`}>{stat.value}</p>
-                    <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-center text-sm`}>{stat.label}</p>
+                    <p className={`text-xl lg:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'} mb-1`}>{stat.value}</p>
+                    <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-center text-xs lg:text-sm`}>{stat.label}</p>
                   </div>
                 </div>
               ))}

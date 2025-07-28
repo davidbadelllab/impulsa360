@@ -81,14 +81,7 @@ const Footer = () => {
                   <Globe size={16} className="mr-2" />
                   <span>Presencia global</span>
                 </div>
-                <div className={`inline-flex items-center rounded-lg px-4 py-2 ${
-                  theme === 'dark'
-                    ? 'bg-indigo-900/20 border-indigo-800/30 text-indigo-300'
-                    : 'bg-indigo-50 border-indigo-200 text-indigo-700'
-                } border`}>
-                  <Award size={16} className="mr-2" />
-                  <span>Premiados 2024</span>
-                </div>
+                
                 <div className={`inline-flex items-center rounded-lg px-4 py-2 ${
                   theme === 'dark'
                     ? 'bg-purple-900/20 border-purple-800/30 text-purple-300'
@@ -113,7 +106,7 @@ const Footer = () => {
                     theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
                   }`} />
                   <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>
-                    Maracaibo, Venezuela <br/>Edificio Millenium, Torre A, Piso 5
+                  Calle 67B, con Avenida 10, Maracaibo 4001, Zulia, Venezuela
                   </p>
                 </div>
                 <div className="flex items-center">
@@ -221,7 +214,7 @@ const Footer = () => {
             theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
           }`}>
             <div>
-              &copy; {new Date().getFullYear()} Impulsa360. Todos los derechos reservados
+              &copy; 2016 Impulsa360. Todos los derechos reservados
             </div>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <a href="/terms" className={`transition-colors ${

@@ -318,6 +318,7 @@ export class UserRepository {
 
   async checkCriticalDependencies(id: number): Promise<boolean> {
     try {
+      // Verificar proyectos abiertos creados por el usuario
       const projectsQuery = `
         SELECT COUNT(*) FROM projects 
         WHERE created_by = $1 AND status != 'CLOSED'
@@ -328,6 +329,18 @@ export class UserRepository {
         return true;
       }
       
+      // Verificar boards creados por el usuario
+      const boardsQuery = `
+        SELECT COUNT(*) FROM boards 
+        WHERE created_by = $1
+      `;
+      const boardsResult = await this.pool.query(boardsQuery, [id]);
+      
+      if (parseInt(boardsResult.rows[0].count, 10) > 0) {
+        return true;
+      }
+      
+      // Verificar si es el único admin de una compañía
       const adminQuery = `
         SELECT COUNT(*) FROM ${this.table} u 
         JOIN companies c ON u.company_id = c.id 
