@@ -46,6 +46,10 @@ export const getArticleById = async (req, res) => {
 // Crear un artículo
 export const createArticle = async (req, res) => {
   try {
+    console.log('=== CREATE ARTICLE DEBUG ===');
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+    console.log('Body keys:', Object.keys(req.body));
+    
     const {
       title,
       slug,
@@ -66,34 +70,69 @@ export const createArticle = async (req, res) => {
       seo_keywords
     } = req.body;
 
+    console.log('Extracted fields:');
+    console.log({ title, slug, excerpt, content: content?.length || 0, featured_image_url: featured_image_url?.length || 0 });
+    console.log({ category_id, author_id, guest_author_id, read_time_minutes, status });
+    console.log({ is_trending, is_featured, is_published, published_at });
+    console.log({ meta_title, meta_description, seo_keywords });
+
+    // Basic validation - remove undefined values that could cause DB issues
+    const insertData = {
+      title: title || null,
+      slug: slug || null,
+      excerpt: excerpt || null,
+      content: content || null,
+      featured_image_url: featured_image_url || null,
+      category_id: category_id || null,
+      author_id: author_id || null,
+      guest_author_id: guest_author_id || null,
+      read_time_minutes: read_time_minutes || null,
+      status: status || 'draft',
+      is_trending: Boolean(is_trending),
+      is_featured: Boolean(is_featured),
+      is_published: Boolean(is_published),
+      published_at: published_at || null,
+      meta_title: meta_title || null,
+      meta_description: meta_description || null,
+      seo_keywords: seo_keywords || null
+    };
+
+    // Validate required fields
+    if (!insertData.title) {
+      return res.status(400).json({ error: 'Title is required' });
+    }
+    if (!insertData.content) {
+      return res.status(400).json({ error: 'Content is required' });
+    }
+
+    console.log('About to insert to Supabase:');
+    console.log('Insert data keys:', Object.keys(insertData));
+    console.log('Insert data size (JSON):', JSON.stringify(insertData).length, 'bytes');
+
     const { data, error } = await supabase
       .from('articles')
-      .insert([{
-        title,
-        slug,
-        excerpt,
-        content,
-        featured_image_url,
-        category_id,
-        author_id,
-        guest_author_id,
-        read_time_minutes,
-        status,
-        is_trending,
-        is_featured,
-        is_published,
-        published_at,
-        meta_title,
-        meta_description,
-        seo_keywords
-      }])
+      .insert([insertData])
       .select();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error details:');
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      console.error('Error details:', error.details);
+      console.error('Error hint:', error.hint);
+      console.error('Full error object:', JSON.stringify(error, null, 2));
+      throw error;
+    }
 
+    console.log('Article created successfully:', data[0]?.id);
     res.status(201).json(data[0]);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('=== CREATE ARTICLE ERROR ===');
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    console.error('Full error object:', JSON.stringify(error, null, 2));
+    res.status(500).json({ error: error.message, details: error.details || null });
   }
 };
 

@@ -57,18 +57,10 @@ const BlogCreateEdit = () => {
     tags: []
   });
 
-  const [categories] = useState([
-    { id: '1', name: 'Marketing Digital' },
-    { id: '2', name: 'Tecnología' },
-    { id: '3', name: 'Seguridad' },
-    { id: '4', name: 'SEO' }
-  ]);
-
-  const [authors] = useState([
-    { id: '1', name: 'Luis Chavez' },
-    { id: '2', name: 'David Badell' },
-    { id: '3', name: 'Pedro Sánchez' }
-  ]);
+  const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
+  const [authors, setAuthors] = useState<{id: string, name: string}[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [authorsLoading, setAuthorsLoading] = useState(true);
 
   const [availableTags] = useState([
     'Marketing', 'Digital', 'SEO', 'Seguridad', 'Tecnología', 'IA', 'E-commerce', 'Innovación'
@@ -77,6 +69,43 @@ const BlogCreateEdit = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  // Fetch categories and authors
+  useEffect(() => {
+    const fetchCategoriesAndAuthors = async () => {
+      try {
+        // Fetch categories
+        const categoriesResponse = await fetch('/api/blog/categories');
+        if (categoriesResponse.ok) {
+          const categoriesData = await categoriesResponse.json();
+          setCategories(categoriesData);
+          // Set default category if creating new article
+          if (!isEdit && categoriesData.length > 0 && !formData.category_id) {
+            handleInputChange('category_id', categoriesData[0].id);
+          }
+        }
+        setCategoriesLoading(false);
+
+        // Fetch authors
+        const authorsResponse = await fetch('/api/blog/authors');
+        if (authorsResponse.ok) {
+          const authorsData = await authorsResponse.json();
+          setAuthors(authorsData);
+          // Set default author if creating new article
+          if (!isEdit && authorsData.length > 0 && !formData.author_id) {
+            handleInputChange('author_id', authorsData[0].id);
+          }
+        }
+        setAuthorsLoading(false);
+      } catch (error) {
+        console.error('Error fetching categories and authors:', error);
+        setCategoriesLoading(false);
+        setAuthorsLoading(false);
+      }
+    };
+
+    fetchCategoriesAndAuthors();
+  }, [isEdit, formData.category_id, formData.author_id]);
 
   useEffect(() => {
     if (isEdit && id) {
@@ -88,8 +117,8 @@ const BlogCreateEdit = () => {
         excerpt: "Este es un extracto de ejemplo...",
         content: "Contenido del artículo...",
         featured_image_url: "",
-        category_id: "1",
-        author_id: "1",
+        category_id: "", // Will be set with real UUID once loaded
+        author_id: "", // Will be set with real UUID once loaded
         status: 'draft',
         is_featured: false,
         is_trending: false,
