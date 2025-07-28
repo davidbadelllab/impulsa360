@@ -12,7 +12,8 @@ import {
   User,
   TrendingUp,
   Star,
-  MoreVertical
+  MoreVertical,
+  Loader2
 } from 'lucide-react';
 
 interface Article {
@@ -20,58 +21,63 @@ interface Article {
   title: string;
   excerpt: string;
   status: 'draft' | 'published' | 'scheduled';
-  author: string;
-  category: string;
+  author_name?: string;
+  category_name?: string;
   created_at: string;
-  views: number;
+  views?: number;
   is_featured: boolean;
   is_trending: boolean;
+  content?: string;
+  slug?: string;
 }
 
 const BlogAdmin = () => {
-  console.log('BlogAdmin component loaded - Dashboard Blog Administration');
-  
-  const [articles, setArticles] = useState<Article[]>([
-    {
-      id: 1,
-      title: "10 Tendencias de Marketing Digital para 2024",
-      excerpt: "Descubre las estrategias y tecnologías emergentes que están redefiniendo el marketing digital...",
-      status: 'published',
-      author: "Luis Chavez",
-      category: "Marketing Digital",
-      created_at: "2024-03-15",
-      views: 1250,
-      is_featured: true,
-      is_trending: true
-    },
-    {
-      id: 2,
-      title: "Ciberseguridad: Protegiendo tu Negocio en la Era Digital",
-      excerpt: "Estrategias avanzadas de protección contra ciberataques y cómo implementar protocolos...",
-      status: 'published',
-      author: "Luis Chavez",
-      category: "Seguridad",
-      created_at: "2024-03-12",
-      views: 980,
-      is_featured: true,
-      is_trending: false
-    },
-    {
-      id: 3,
-      title: "Inteligencia Artificial en el E-commerce",
-      excerpt: "Análisis detallado de cómo la IA está revolucionando cada aspecto del e-commerce...",
-      status: 'draft',
-      author: "David Badell",
-      category: "Tecnología",
-      created_at: "2024-03-10",
-      views: 0,
-      is_featured: false,
-      is_trending: false
-    }
-  ]);
-
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+
+  // Fetch articles from API
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/blog/articles');
+        
+        if (!response.ok) {
+          throw new Error('Error al cargar los artículos');
+        }
+        
+        const data = await response.json();
+        
+        // Transform API data to match our interface
+        const transformedArticles = data.map((article: any) => ({
+          id: article.id,
+          title: article.title,
+          excerpt: article.excerpt || '',
+          status: article.status || 'draft',
+          author_name: article.author_name || 'Autor desconocido',
+          category_name: article.category_name || 'Sin categoría',
+          created_at: article.created_at,
+          views: article.total_views || 0,
+          is_featured: article.is_featured || false,
+          is_trending: article.is_trending || false,
+          content: article.content,
+          slug: article.slug
+        }));
+        
+        setArticles(transformedArticles);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Error desconocido');
+        console.error('Error fetching articles:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArticles();
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -91,18 +97,61 @@ const BlogAdmin = () => {
     }
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este artículo?')) {
-      setArticles(articles.filter(article => article.id !== id));
+      try {
+        const response = await fetch(`/api/blog/articles/${id}`, {
+          method: 'DELETE'
+        });
+        
+        if (response.ok) {
+          setArticles(articles.filter(article => article.id !== id));
+        } else {
+          throw new Error('Error al eliminar el artículo');
+        }
+      } catch (err) {
+        console.error('Error deleting article:', err);
+        alert('Error al eliminar el artículo');
+      }
     }
   };
 
   const filteredArticles = articles.filter(article => {
     const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         article.author.toLowerCase().includes(searchTerm.toLowerCase());
+                         (article.author_name || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || article.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="p-6 bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="flex items-center gap-3">
+          <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+          <p className="text-gray-600">Cargando artículos...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="p-6 bg-gray-50 min-h-screen">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h3 className="text-red-800 font-medium">Error al cargar los artículos</h3>
+          <p className="text-red-600 mt-1">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-3 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -210,28 +259,28 @@ const BlogAdmin = () => {
       {/* Articles Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[800px]">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5">
                   Artículo
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Estado
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                   Autor
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                   Categoría
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                   Fecha
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                   Vistas
                 </th>
-                <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
                   Acciones
                 </th>
               </tr>
@@ -239,7 +288,7 @@ const BlogAdmin = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredArticles.map((article) => (
                 <tr key={article.id} className="hover:bg-gray-50 transition-colors duration-150">
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-4">
                     <div className="flex items-start space-x-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
@@ -247,36 +296,41 @@ const BlogAdmin = () => {
                             {article.title}
                           </p>
                           {article.is_featured && (
-                            <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                            <Star className="h-4 w-4 text-yellow-500 fill-current flex-shrink-0" />
                           )}
                           {article.is_trending && (
-                            <TrendingUp className="h-4 w-4 text-red-500" />
+                            <TrendingUp className="h-4 w-4 text-red-500 flex-shrink-0" />
                           )}
                         </div>
                         <p className="text-sm text-gray-500 mt-1 line-clamp-2">
                           {article.excerpt}
                         </p>
+                        {/* Show mobile info */}
+                        <div className="mt-2 flex items-center gap-4 text-xs text-gray-500 md:hidden">
+                          <span>{article.author_name}</span>
+                          <span>{new Date(article.created_at).toLocaleDateString('es-ES')}</span>
+                        </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full border ${getStatusColor(article.status)}`}>
                       {getStatusText(article.status)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-4 whitespace-nowrap hidden md:table-cell">
                     <div className="flex items-center">
                       <User className="h-4 w-4 text-gray-400 mr-2" />
-                      <span className="text-sm text-gray-900">{article.author}</span>
+                      <span className="text-sm text-gray-900">{article.author_name}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-4 whitespace-nowrap hidden lg:table-cell">
                     <div className="flex items-center">
                       <Tag className="h-4 w-4 text-gray-400 mr-2" />
-                      <span className="text-sm text-gray-600">{article.category}</span>
+                      <span className="text-sm text-gray-600">{article.category_name}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-4 whitespace-nowrap hidden sm:table-cell">
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 text-gray-400 mr-2" />
                       <span className="text-sm text-gray-600">
@@ -284,30 +338,32 @@ const BlogAdmin = () => {
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-4 whitespace-nowrap hidden lg:table-cell">
                     <span className="text-sm text-gray-900">
-                      {article.views.toLocaleString()}
+                      {(article.views || 0).toLocaleString()}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex items-center justify-end space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900 p-1 rounded transition-colors duration-150">
+                  <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div className="flex items-center justify-end space-x-1">
+                      <button 
+                        className="text-blue-600 hover:text-blue-900 p-1.5 rounded transition-colors duration-150"
+                        title="Ver artículo"
+                      >
                         <Eye className="h-4 w-4" />
                       </button>
                       <Link
                         to={`/dashboard/blog/edit/${article.id}`}
-                        className="text-indigo-600 hover:text-indigo-900 p-1 rounded transition-colors duration-150"
+                        className="text-indigo-600 hover:text-indigo-900 p-1.5 rounded transition-colors duration-150"
+                        title="Editar artículo"
                       >
                         <Edit className="h-4 w-4" />
                       </Link>
                       <button
                         onClick={() => handleDelete(article.id)}
-                        className="text-red-600 hover:text-red-900 p-1 rounded transition-colors duration-150"
+                        className="text-red-600 hover:text-red-900 p-1.5 rounded transition-colors duration-150"
+                        title="Eliminar artículo"
                       >
                         <Trash2 className="h-4 w-4" />
-                      </button>
-                      <button className="text-gray-400 hover:text-gray-600 p-1 rounded transition-colors duration-150">
-                        <MoreVertical className="h-4 w-4" />
                       </button>
                     </div>
                   </td>
