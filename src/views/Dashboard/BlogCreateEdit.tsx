@@ -62,6 +62,9 @@ const BlogCreateEdit = () => {
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [authorsLoading, setAuthorsLoading] = useState(true);
 
+  // API base URL with proper environment variable handling
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+
   const [availableTags] = useState([
     'Marketing', 'Digital', 'SEO', 'Seguridad', 'Tecnología', 'IA', 'E-commerce', 'Innovación'
   ]);
@@ -75,7 +78,7 @@ const BlogCreateEdit = () => {
     const fetchCategoriesAndAuthors = async () => {
       try {
         // Fetch categories
-        const categoriesResponse = await fetch('/api/blog/categories');
+        const categoriesResponse = await fetch(`${API_BASE_URL}/api/blog/categories`);
         if (categoriesResponse.ok) {
           const categoriesData = await categoriesResponse.json();
           console.log('Categories fetched:', categoriesData);
@@ -91,7 +94,7 @@ const BlogCreateEdit = () => {
         setCategoriesLoading(false);
 
         // Fetch authors
-        const authorsResponse = await fetch('/api/blog/authors');
+        const authorsResponse = await fetch(`${API_BASE_URL}/api/blog/authors`);
         if (authorsResponse.ok) {
           const authorsData = await authorsResponse.json();
           console.log('Authors fetched:', authorsData);
@@ -194,13 +197,22 @@ const BlogCreateEdit = () => {
     setError(null);
     
     try {
+      // Transform seo_keywords from string to array
+      const seoKeywordsArray = formData.seo_keywords
+        .split(',')
+        .map(keyword => keyword.trim())
+        .filter(keyword => keyword.length > 0);
+
       const dataToSave = {
         ...formData,
+        seo_keywords: seoKeywordsArray, // Send as array, not string
         status,
         published_at: status === 'published' ? new Date().toISOString() : formData.published_at
       };
       
-      const url = isEdit ? `/api/blog/articles/${id}` : '/api/blog/articles';
+      console.log('Data to save:', dataToSave); // Debug log
+      
+      const url = isEdit ? `${API_BASE_URL}/api/blog/articles/${id}` : `${API_BASE_URL}/api/blog/articles`;
       const method = isEdit ? 'PUT' : 'POST';
       
       const response = await fetch(url, {
@@ -353,7 +365,7 @@ const BlogCreateEdit = () => {
                     value={formData.title}
                     onChange={(e) => handleTitleChange(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
-                    placeholder="Ingresa el título de tu artículo"
+                    placeholder="Ej: Guía completa de marketing digital para 2024"
                   />
                 </div>
 
@@ -369,7 +381,7 @@ const BlogCreateEdit = () => {
                       value={formData.slug}
                       onChange={(e) => handleInputChange('slug', e.target.value)}
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ml-1"
-                      placeholder="url-del-articulo"
+                      placeholder="guia-marketing-digital-2024"
                     />
                   </div>
                 </div>
@@ -434,7 +446,7 @@ const BlogCreateEdit = () => {
                     onChange={(e) => handleInputChange('excerpt', e.target.value)}
                     rows={3}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Breve descripción del artículo que aparecerá en las vistas previas..."
+                    placeholder="Ej: Descubre las estrategias más efectivas para impulsar tu negocio en el mundo digital con esta guía completa paso a paso."
                   />
                   <p className="text-sm text-gray-500 mt-1">
                     {formData.excerpt.length}/160 caracteres recomendados
@@ -451,7 +463,7 @@ const BlogCreateEdit = () => {
                     onChange={(e) => handleInputChange('content', e.target.value)}
                     rows={20}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
-                    placeholder="Escribe el contenido de tu artículo en Markdown..."
+                    placeholder="# Mi Artículo\n\nEscribe aquí el contenido de tu artículo usando **Markdown**. \n\n## Subtítulo\n\nPuedes usar listas:\n- Elemento 1\n- Elemento 2\n\nY enlaces: [texto del enlace](https://ejemplo.com)"
                   />
                 </div>
               </div>
@@ -469,7 +481,7 @@ const BlogCreateEdit = () => {
                     value={formData.meta_title}
                     onChange={(e) => handleInputChange('meta_title', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Título para motores de búsqueda (máx. 60 caracteres)"
+                    placeholder="Ej: Marketing Digital 2024: Guía Completa y Actualizada"
                   />
                   <p className="text-sm text-gray-500 mt-1">
                     {formData.meta_title.length}/60 caracteres
@@ -485,7 +497,7 @@ const BlogCreateEdit = () => {
                     onChange={(e) => handleInputChange('meta_description', e.target.value)}
                     rows={3}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Descripción para motores de búsqueda (máx. 160 caracteres)"
+                    placeholder="Ej: Aprende las mejores estrategias de marketing digital para 2024. Guía paso a paso con herramientas, técnicas y consejos de expertos."
                   />
                   <p className="text-sm text-gray-500 mt-1">
                     {formData.meta_description.length}/160 caracteres
@@ -501,10 +513,10 @@ const BlogCreateEdit = () => {
                     value={formData.seo_keywords}
                     onChange={(e) => handleInputChange('seo_keywords', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="palabra1, palabra2, palabra3"
+                    placeholder="marketing digital, SEO, estrategias online, publicidad digital"
                   />
                   <p className="text-sm text-gray-500 mt-1">
-                    Separa las palabras clave con comas
+                    Separa las palabras clave con comas (sin coma al final). Ej: marketing, SEO, digital
                   </p>
                 </div>
               </div>

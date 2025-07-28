@@ -2,19 +2,18 @@ import axios from 'axios';
 
 // Configuración dinámica de la URL base para diferentes entornos
 const getBaseURL = () => {
-  // En el cliente, verificar si tenemos variables de entorno definidas
+  // Prioridad 1: Variable de entorno de Vite
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  
+  // Prioridad 2: Variable global personalizada (para casos especiales)
+  if (typeof window !== 'undefined' && (window as any).__API_BASE_URL__) {
+    return (window as any).__API_BASE_URL__;
+  }
+  
+  // Prioridad 3: Detectar automáticamente basado en la URL actual
   if (typeof window !== 'undefined') {
-    // Prioridad 1: Variable de entorno del build time
-    if (process.env.NEXT_PUBLIC_API_BASE_URL) {
-      return process.env.NEXT_PUBLIC_API_BASE_URL;
-    }
-    
-    // Prioridad 2: Variable global personalizada
-    if ((window as any).__API_BASE_URL__) {
-      return (window as any).__API_BASE_URL__;
-    }
-    
-    // Prioridad 3: Detectar automáticamente basado en la URL actual
     const protocol = window.location.protocol;
     const hostname = window.location.hostname;
     const port = window.location.port;
@@ -28,8 +27,8 @@ const getBaseURL = () => {
     return port ? `${protocol}//${hostname}:${port}/api` : `${protocol}//${hostname}/api`;
   }
   
-  // Server-side rendering: usar variables de entorno o fallback
-  return process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
+  // Fallback para casos edge
+  return 'http://localhost:3000/api';
 };
 
 const baseURL = getBaseURL();
