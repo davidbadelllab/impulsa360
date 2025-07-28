@@ -74,6 +74,10 @@ const BlogCreateEdit = () => {
     'Marketing', 'Digital', 'SEO', 'Seguridad', 'Tecnología', 'IA', 'E-commerce', 'Innovación'
   ]);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   useEffect(() => {
     if (isEdit && id) {
       // Aquí cargarías los datos del artículo desde el backend
@@ -130,18 +134,61 @@ const BlogCreateEdit = () => {
     handleInputChange('tags', formData.tags.filter(t => t !== tag));
   };
 
-  const handleSave = (status: 'draft' | 'published') => {
-    const dataToSave = {
-      ...formData,
-      status,
-      published_at: status === 'published' ? new Date().toISOString() : formData.published_at
-    };
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        setError('La imagen no puede exceder 5MB');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64String = e.target?.result as string;
+        setImagePreview(base64String);
+        handleInputChange('featured_image_url', base64String);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSave = async (status: 'draft' | 'published') => {
+    setIsLoading(true);
+    setError(null);
     
-    // Aquí enviarías los datos al backend
-    console.log('Saving article:', dataToSave);
-    
-    // Redirigir al listado
-    navigate('/dashboard/blog');
+    try {
+      const dataToSave = {
+        ...formData,
+        status,
+        published_at: status === 'published' ? new Date().toISOString() : formData.published_at
+      };
+      
+      const url = isEdit ? `/api/blog/articles/${id}` : '/api/blog/articles';
+      const method = isEdit ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSave)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      console.log('Article saved:', result);
+      
+      // Redirigir al listado
+      navigate('/dashboard/blog');
+    } catch (err) {
+      console.error('Error saving article:', err);
+      setError(err instanceof Error ? err.message : 'Error al guardar el artículo');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handlePreview = () => {
@@ -173,23 +220,34 @@ const BlogCreateEdit = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={handlePreview}
-              className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              disabled={isLoading}
+              className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Eye size={16} />
               Vista Previa
             </button>
             <button
               onClick={() => handleSave('draft')}
-              className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              disabled={isLoading}
+              className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <FileText size={16} />
+              {isLoading ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-700"></div>
+              ) : (
+                <FileText size={16} />
+              )}
               Guardar Borrador
             </button>
             <button
               onClick={() => handleSave('published')}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+              disabled={isLoading}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Save size={16} />
+              {isLoading ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              ) : (
+                <Save size={16} />
+              )}
               Publicar
             </button>
           </div>
@@ -200,6 +258,27 @@ const BlogCreateEdit = () => {
         {/* Main Content */}
         <div className="flex-1 p-6">
           <div className="max-w-4xl mx-auto">
+            {/* Error Message */}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <X className="h-5 w-5 text-red-400" />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-red-800">{error}</p>
+                  </div>
+                  <div className="ml-auto pl-3">
+                    <button
+                      onClick={() => setError(null)}
+                      className="inline-flex rounded-md bg-red-50 p-1.5 text-red-500 hover:bg-red-100"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
             {/* Tabs */}
             <div className="border-b border-gray-200 mb-6">
               <nav className="-mb-px flex space-x-8">
@@ -264,16 +343,19 @@ const BlogCreateEdit = () => {
                     Imagen Destacada
                   </label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                    {formData.featured_image_url ? (
+                    {formData.featured_image_url || imagePreview ? (
                       <div className="relative">
                         <img
-                          src={formData.featured_image_url}
+                          src={imagePreview || formData.featured_image_url}
                           alt="Featured"
                           className="max-h-48 mx-auto rounded"
                         />
                         <button
-                          onClick={() => handleInputChange('featured_image_url', '')}
-                          className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full"
+                          onClick={() => {
+                            handleInputChange('featured_image_url', '');
+                            setImagePreview(null);
+                          }}
+                          className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
                         >
                           <X size={16} />
                         </button>
@@ -282,16 +364,27 @@ const BlogCreateEdit = () => {
                       <div>
                         <Upload className="mx-auto h-12 w-12 text-gray-400" />
                         <div className="mt-2">
-                          <button className="text-blue-600 hover:text-blue-500">
+                          <button 
+                            type="button"
+                            onClick={() => document.getElementById('image-upload')?.click()}
+                            className="text-blue-600 hover:text-blue-500"
+                          >
                             Subir imagen
                           </button>
                           <p className="text-gray-500 text-sm mt-1">
-                            o arrastra y suelta aquí
+                            o arrastra y suelta aquí (máx. 5MB)
                           </p>
                         </div>
                       </div>
                     )}
                   </div>
+                  <input
+                    id="image-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
                 </div>
 
                 {/* Excerpt */}
