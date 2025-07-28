@@ -22,7 +22,9 @@ import { listRoutes } from './debug-routes.js';
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
+// Aumentar límite del cuerpo de las peticiones para permitir subida de imágenes
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 // Importar conexión a base de datos
 import { createClient } from '@supabase/supabase-js';
