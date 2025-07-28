@@ -107,6 +107,6 @@ export const dashboardRoutes = [
   },
   {
     path: 'videoconference',
-    element: [94m<VideoConferencePage /[39m[94m>[39m
+    element: <VideoConferencePage />
   }
 ]
