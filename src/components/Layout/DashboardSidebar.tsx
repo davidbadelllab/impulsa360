@@ -43,7 +43,7 @@ export default function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarP
     { path: "/dashboard/tasks", icon: <CheckSquare />, label: "Tasks" },
     { path: "/dashboard/messages", icon: <MessageSquare />, label: "Messages" },
     { path: "/dashboard/media", icon: <HardDrive />, label: "Media" },
-    { path: "/dashboard/blog", icon: <BookOpen />, label: "Blog" },
+    { path: "/blog", icon: <BookOpen />, label: "Blog" },
     { path: "/dashboard/videoconference", icon: <Video />, label: "Videoconferencias" },
   ]
 
