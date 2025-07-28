@@ -9,6 +9,7 @@ import Services from './views/Services/Services';
 import Systems from './views/Systems/Systems';
 import SuccessCases from './views/SuccessCases/SuccessCases';
 import Blog from './views/Blog/Blog';
+import BlogDetail from './views/Blog/BlogDetail';
 import Contact from './views/Contact/Contact';
 import FAQ from './views/FAQ/FAQ';
 import About from './views/About/About';
@@ -75,6 +76,10 @@ const router = createBrowserRouter([
       {
         path: 'blog',
         element: <Blog />
+      },
+      {
+        path: 'blog/:id',
+        element: <BlogDetail />
       },
       {
         path: 'contact',

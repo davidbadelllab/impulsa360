@@ -345,12 +345,13 @@ const BlogAdmin = () => {
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end space-x-1">
-                      <button 
+                      <Link
+                        to={`/dashboard/blog/view/${article.id}`}
                         className="text-blue-600 hover:text-blue-900 p-1.5 rounded transition-colors duration-150"
                         title="Ver artículo"
                       >
                         <Eye className="h-4 w-4" />
-                      </button>
+                      </Link>
                       <Link
                         to={`/dashboard/blog/edit/${article.id}`}
                         className="text-indigo-600 hover:text-indigo-900 p-1.5 rounded transition-colors duration-150"

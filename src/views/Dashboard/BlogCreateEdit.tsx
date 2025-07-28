@@ -120,27 +120,53 @@ const BlogCreateEdit = () => {
 
   useEffect(() => {
     if (isEdit && id) {
-      // Aquí cargarías los datos del artículo desde el backend
-      // Por ahora usamos datos de ejemplo
-      setFormData({
-        title: "Artículo de ejemplo",
-        slug: "articulo-de-ejemplo",
-        excerpt: "Este es un extracto de ejemplo...",
-        content: "Contenido del artículo...",
-        featured_image_url: "",
-        category_id: "", // Will be set with real UUID once loaded
-        author_id: "", // Will be set with real UUID once loaded
-        status: 'draft',
-        is_featured: false,
-        is_trending: false,
-        published_at: '',
-        meta_title: '',
-        meta_description: '',
-        seo_keywords: '',
-        tags: ['Marketing', 'Digital']
-      });
+      const fetchArticle = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/blog/articles/${id}`);
+          if (response.ok) {
+            const articleData = await response.json();
+            console.log('Article data loaded for editing:', articleData);
+            
+            // Convert tags array to string if needed
+            const tagsArray = Array.isArray(articleData.tags) ? articleData.tags : [];
+            
+            setFormData({
+              title: articleData.title || '',
+              slug: articleData.slug || '',
+              excerpt: articleData.excerpt || '',
+              content: articleData.content || '',
+              featured_image_url: articleData.featured_image_url || '',
+              category_id: articleData.category_id || '',
+              author_id: articleData.author_id || '',
+              status: articleData.status || 'draft',
+              is_featured: Boolean(articleData.is_featured),
+              is_trending: Boolean(articleData.is_trending),
+              published_at: articleData.published_at ? new Date(articleData.published_at).toISOString().slice(0, 16) : '',
+              meta_title: articleData.meta_title || '',
+              meta_description: articleData.meta_description || '',
+              seo_keywords: Array.isArray(articleData.seo_keywords) 
+                ? articleData.seo_keywords.join(', ') 
+                : (articleData.seo_keywords || ''),
+              tags: tagsArray
+            });
+            
+            // Set image preview if there's a featured image
+            if (articleData.featured_image_url) {
+              setImagePreview(articleData.featured_image_url);
+            }
+          } else {
+            console.error('Error loading article:', response.statusText);
+            setError('Error al cargar el artículo');
+          }
+        } catch (error) {
+          console.error('Error fetching article:', error);
+          setError('Error al cargar el artículo');
+        }
+      };
+      
+      fetchArticle();
     }
-  }, [isEdit, id]);
+  }, [isEdit, id, API_BASE_URL]);
 
   const handleInputChange = (field: keyof ArticleForm, value: any) => {
     setFormData(prev => ({

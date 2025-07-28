@@ -17,15 +17,47 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 // Obtener todos los artículos con información completa
 export const getArticles = async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from('articles_with_details')
+    // Consulta simplificada sin relaciones para evitar conflictos
+    const { data: articles, error } = await supabase
+      .from('articles')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching articles:', error);
+      throw error;
+    }
 
-    res.json(data);
+    // Obtener categorías y autores por separado
+    const { data: categories } = await supabase
+      .from('categories')
+      .select('id, name, slug, color');
+
+    const { data: authors } = await supabase
+      .from('authors')
+      .select('id, name, email, position');
+
+    // Combinar los datos manualmente
+    const articlesWithDetails = articles.map(article => {
+      const category = categories?.find(c => c.id === article.category_id);
+      const author = authors?.find(a => a.id === article.author_id);
+      const guestAuthor = authors?.find(a => a.id === article.guest_author_id);
+      
+      return {
+        ...article,
+        category_name: category?.name || 'Sin categoría',
+        category_slug: category?.slug,
+        category_color: category?.color,
+        author_name: author?.name || guestAuthor?.name || 'Autor desconocido',
+        author_email: author?.email || guestAuthor?.email,
+        author_position: author?.position || guestAuthor?.position
+      };
+    });
+
+    console.log('Articles fetched:', articlesWithDetails?.length || 0, 'items');
+    res.json(articlesWithDetails);
   } catch (error) {
+    console.error('Articles API error:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -34,16 +66,51 @@ export const getArticles = async (req, res) => {
 export const getArticleById = async (req, res) => {
   try {
     const { id } = req.params;
-    const { data, error } = await supabase
-      .from('articles_with_details')
+    
+    // Obtener el artículo
+    const { data: article, error } = await supabase
+      .from('articles')
       .select('*')
       .eq('id', id)
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching article:', error);
+      throw error;
+    }
 
-    res.json(data);
+    if (!article) {
+      return res.status(404).json({ error: 'Artículo no encontrado' });
+    }
+
+    // Obtener categorías y autores por separado
+    const { data: categories } = await supabase
+      .from('categories')
+      .select('id, name, slug, color');
+
+    const { data: authors } = await supabase
+      .from('authors')
+      .select('id, name, email, position');
+
+    // Combinar los datos manualmente
+    const category = categories?.find(c => c.id === article.category_id);
+    const author = authors?.find(a => a.id === article.author_id);
+    const guestAuthor = authors?.find(a => a.id === article.guest_author_id);
+    
+    const articleWithDetails = {
+      ...article,
+      category_name: category?.name || 'Sin categoría',
+      category_slug: category?.slug,
+      category_color: category?.color,
+      author_name: author?.name || guestAuthor?.name || 'Autor desconocido',
+      author_email: author?.email || guestAuthor?.email,
+      author_position: author?.position || guestAuthor?.position
+    };
+
+    console.log('Article fetched by ID:', article.id);
+    res.json(articleWithDetails);
   } catch (error) {
+    console.error('Article by ID API error:', error);
     res.status(500).json({ error: error.message });
   }
 };
