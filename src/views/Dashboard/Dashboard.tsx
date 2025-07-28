@@ -16,6 +16,8 @@ import HelpPage from "./HelpPage"
 import PlansPage from './PlansPage';
 import CompanyPlansPage from './CompanyPlansPage';
 import VideoConferencePage from './VideoConferencePage';
+import BlogAdmin from './BlogAdmin';
+import BlogCreateEdit from './BlogCreateEdit';
 import { useAuth } from "../../context/AuthContext"
 
 export default function Dashboard() {
@@ -92,7 +94,19 @@ export const dashboardRoutes = [
     element: <CompanyPlansPage />
   },
   {
-    path: 'videoconference',
-    element: <VideoConferencePage />
+    path: 'blog',
+    element: <BlogAdmin />
   },
+  {
+    path: 'blog/create',
+    element: <BlogCreateEdit />
+  },
+  {
+    path: 'blog/edit/:id',
+    element: <BlogCreateEdit />
+  },
+  {
+    path: 'videoconference',
+    element: [94m<VideoConferencePage /[39m[94m>[39m
+  }
 ]
