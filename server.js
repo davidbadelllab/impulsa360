@@ -98,7 +98,7 @@ app.get('/api/test-auth', authMiddleware, (req, res) => {
 
 // Endpoints para obtener datos reales de la base de datos
 // Endpoint para obtener usuarios
-app.get('/api/users', async (req, res) => {
+app.get('/api/users', authMiddleware, async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('users')
@@ -114,7 +114,7 @@ app.get('/api/users', async (req, res) => {
 });
 
 // Endpoint para crear usuarios
-app.post('/api/users', async (req, res) => {
+app.post('/api/users', authMiddleware, async (req, res) => {
   try {
     console.log('📝 Creating user:', req.body);
     const userData = req.body;
@@ -153,7 +153,7 @@ app.post('/api/users', async (req, res) => {
 });
 
 // Endpoint para actualizar usuarios
-app.put('/api/users/:id', async (req, res) => {
+app.put('/api/users/:id', authMiddleware, async (req, res) => {
   try {
     console.log('📝 Updating user:', req.params.id, req.body);
     const { id } = req.params;
@@ -194,7 +194,7 @@ app.put('/api/users/:id', async (req, res) => {
 });
 
 // Endpoint para eliminar usuarios
-app.delete('/api/users/:id', async (req, res) => {
+app.delete('/api/users/:id', authMiddleware, async (req, res) => {
   try {
     console.log('🗑️ Deleting user:', req.params.id);
     const { id } = req.params;
