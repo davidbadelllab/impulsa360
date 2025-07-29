@@ -101,172 +101,29 @@ const validateCompanyServiceInput = [
   body('end_date').optional().isISO8601().withMessage('End date must be a valid date')
 ];
 
-// Rutas para Users - Implementación simple con Supabase
+// Rutas para Users - COMENTADAS porque ahora están en server.js
+// Se movieron las rutas de users a server.js para evitar conflictos
+/*
 router.put('/users/:id', authMiddleware, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const updateData = req.body;
-    
-    // Si se está actualizando la contraseña, hasearla
-    if (updateData.password) {
-      const bcrypt = await import('bcryptjs');
-      updateData.password = await bcrypt.default.hash(updateData.password, 10);
-    }
-    
-    const { data, error } = await supabase
-      .from('users')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    res.json({
-      success: true,
-      message: 'Usuario actualizado exitosamente',
-      data: data
-    });
-  } catch (error) {
-    console.error('Error actualizando usuario:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Error actualizando usuario',
-      error: error.message 
-    });
-  }
+  // ... código comentado ...
 });
 
-// Ruta para resetear contraseña de un usuario específico
 router.post('/users/:id/reset-password', authMiddleware, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { newPassword } = req.body;
-    
-    if (!newPassword) {
-      return res.status(400).json({
-        success: false,
-        message: 'Nueva contraseña es requerida'
-      });
-    }
-    
-    // Hashear la nueva contraseña
-    const bcrypt = await import('bcryptjs');
-    const hashedPassword = await bcrypt.default.hash(newPassword, 10);
-    
-    const { data, error } = await supabase
-      .from('users')
-      .update({ password: hashedPassword })
-      .eq('id', id)
-      .select('id, username, email')
-      .single();
-    
-    if (error) throw error;
-    
-    res.json({
-      success: true,
-      message: 'Contraseña reseteada exitosamente',
-      data: data
-    });
-  } catch (error) {
-    console.error('Error reseteando contraseña:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Error reseteando contraseña',
-      error: error.message 
-    });
-  }
+  // ... código comentado ...
 });
 
-// Ruta para eliminar un usuario
 router.delete('/users/:id', authMiddleware, async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    const { data, error } = await supabase
-      .from('users')
-      .delete()
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    res.json({
-      success: true,
-      message: 'Usuario eliminado exitosamente',
-      data: data
-    });
-  } catch (error) {
-    console.error('Error eliminando usuario:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Error eliminando usuario',
-      error: error.message 
-    });
-  }
+  // ... código comentado ...
 });
 
-// Ruta para obtener un usuario por ID
 router.get('/users/:id', authMiddleware, async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', id)
-      .single();
-    
-    if (error) throw error;
-    
-    res.json({
-      success: true,
-      data: data
-    });
-  } catch (error) {
-    console.error('Error obteniendo usuario:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Error obteniendo usuario',
-      error: error.message 
-    });
-  }
+  // ... código comentado ...
 });
 
-// Ruta para crear un nuevo usuario
 router.post('/users', authMiddleware, async (req, res) => {
-  try {
-    const userData = req.body;
-    
-    // Hashear la contraseña
-    if (userData.password) {
-      const bcrypt = await import('bcryptjs');
-      userData.password = await bcrypt.default.hash(userData.password, 10);
-    }
-    
-    const { data, error } = await supabase
-      .from('users')
-      .insert([userData])
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    res.status(201).json({
-      success: true,
-      message: 'Usuario creado exitosamente',
-      data: data
-    });
-  } catch (error) {
-    console.error('Error creando usuario:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Error creando usuario',
-      error: error.message 
-    });
-  }
+  // ... código comentado ...
 });
+*/
 
 // Otras rutas comentadas temporalmente hasta crear controladores JS
 // TODO: Convertir controladores TS a JS cuando sea necesario

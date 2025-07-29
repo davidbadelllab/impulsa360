@@ -303,7 +303,7 @@ export default function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarP
         </div>
 
         {/* Sección de Conciliaciones */}
-        <div className="mt-4 mb-2 text-xs font-bold text-indigo-200 uppercase tracking-wider pl-2">Conciliaciones</div>
+        <div className="mt-4 mb-2 text-xs font-bold text-indigo-200 uppercase tracking-wider pl-2">Finanzas</div>
         
         {/* Conciliaciones Principal */}
         <div

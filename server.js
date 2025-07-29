@@ -113,6 +113,120 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
+// Endpoint para crear usuarios
+app.post('/api/users', async (req, res) => {
+  try {
+    console.log('📝 Creating user:', req.body);
+    const userData = req.body;
+    
+    // Hashear la contraseña si existe
+    if (userData.password) {
+      const bcrypt = await import('bcryptjs');
+      userData.password = await bcrypt.default.hash(userData.password, 10);
+    }
+    
+    const { data, error } = await supabase
+      .from('users')
+      .insert([userData])
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('❌ Supabase error creating user:', error);
+      throw error;
+    }
+    
+    console.log('✅ User created successfully:', data.id);
+    res.status(201).json({
+      success: true,
+      message: 'Usuario creado exitosamente',
+      data: data
+    });
+  } catch (error) {
+    console.error('💥 Error creating user:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error creando usuario',
+      error: error.message 
+    });
+  }
+});
+
+// Endpoint para actualizar usuarios
+app.put('/api/users/:id', async (req, res) => {
+  try {
+    console.log('📝 Updating user:', req.params.id, req.body);
+    const { id } = req.params;
+    const updateData = req.body;
+    
+    // Hashear la contraseña si se está actualizando
+    if (updateData.password) {
+      const bcrypt = await import('bcryptjs');
+      updateData.password = await bcrypt.default.hash(updateData.password, 10);
+    }
+    
+    const { data, error } = await supabase
+      .from('users')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('❌ Supabase error updating user:', error);
+      throw error;
+    }
+    
+    console.log('✅ User updated successfully:', data.id);
+    res.json({
+      success: true,
+      message: 'Usuario actualizado exitosamente',
+      data: data
+    });
+  } catch (error) {
+    console.error('💥 Error updating user:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error actualizando usuario',
+      error: error.message 
+    });
+  }
+});
+
+// Endpoint para eliminar usuarios
+app.delete('/api/users/:id', async (req, res) => {
+  try {
+    console.log('🗑️ Deleting user:', req.params.id);
+    const { id } = req.params;
+    
+    const { data, error } = await supabase
+      .from('users')
+      .delete()
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('❌ Supabase error deleting user:', error);
+      throw error;
+    }
+    
+    console.log('✅ User deleted successfully:', data.id);
+    res.json({
+      success: true,
+      message: 'Usuario eliminado exitosamente',
+      data: data
+    });
+  } catch (error) {
+    console.error('💥 Error deleting user:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error eliminando usuario',
+      error: error.message 
+    });
+  }
+});
+
 // Endpoint para obtener roles
 app.get('/api/roles', async (req, res) => {
   try {
