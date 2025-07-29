@@ -4,7 +4,13 @@ import axios from 'axios';
 const getBaseURL = () => {
   // Prioridad 1: Variable de entorno de Vite
   if (import.meta.env.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL;
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    // Si la URL ya incluye /api, la usamos tal como está
+    if (baseUrl.endsWith('/api')) {
+      return baseUrl;
+    }
+    // Si no incluye /api, lo agregamos
+    return `${baseUrl}/api`;
   }
   
   // Prioridad 2: Variable global personalizada (para casos especiales)
