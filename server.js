@@ -102,23 +102,10 @@ app.get('/api/users', authMiddleware, async (req, res) => {
   try {
     console.log('📋 Fetching users');
     
-    // Obtener usuarios activos (no eliminados)
+    // Obtener todos los usuarios
     const { data, error } = await supabase
       .from('users')
-      .select(`
-        id,
-        username,
-        email,
-        role_id,
-        company_id,
-        status,
-        is_superadmin,
-        last_login,
-        created_at,
-        updated_at,
-        deleted_at
-      `)
-      .is('deleted_at', null) // Solo usuarios no eliminados
+      .select('*')
       .order('created_at', { ascending: false });
     
     if (error) {
@@ -342,7 +329,6 @@ app.delete('/api/users/:id', authMiddleware, async (req, res) => {
         .from('users')
         .update({ 
           status: 'inactive',
-          deleted_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
         .eq('id', id)
