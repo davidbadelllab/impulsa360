@@ -180,7 +180,7 @@ export default function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarP
       </nav>
 
       {/* Quick Action Button */}
-      {isOpen && (
+      {/* {isOpen && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -194,10 +194,10 @@ export default function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarP
             <span className="text-xs">Create New</span>
           </Button>
         </motion.div>
-      )}
+      )} */}
 
       {/* History Section with improved design */}
-      <div className="mt-auto mx-4 mb-6">
+      {/* <div className="mt-auto mx-4 mb-6">
         <motion.div 
           className="bg-white/5 backdrop-blur-sm rounded-xl p-3 shadow-inner border border-white/10 overflow-hidden"
           whileHover={{ y: -2, boxShadow: "0 10px 20px rgba(0,0,0,0.2)" }}
@@ -246,7 +246,7 @@ export default function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarP
             )}
           </AnimatePresence>
         </motion.div>
-      </div>
+      </div> */}
     </motion.div>
   )
 }
