@@ -63,18 +63,13 @@ class BriefingController {
             const { 
                 type, 
                 category, 
-                title,
-                description,
-                company_id,
-                priority,
-                due_date,
                 status = 'pending', 
                 is_read = false 
             } = req.body;
-            console.log('📝 Creating briefing:', { type, category, title, status, is_read });
+            console.log('📝 Creating briefing:', { type, category, status, is_read });
             
-            if (!type || !title) {
-                return res.status(400).json({ success: false, message: 'Type and title are required' });
+            if (!type) {
+                return res.status(400).json({ success: false, message: 'Type is required' });
             }
             
             const { data, error } = await supabase
@@ -82,11 +77,6 @@ class BriefingController {
                 .insert([{ 
                     type, 
                     category, 
-                    title,
-                    description,
-                    company_id,
-                    priority,
-                    due_date,
                     status, 
                     is_read,
                     created_at: new Date().toISOString(),
@@ -115,15 +105,10 @@ class BriefingController {
             const { 
                 type, 
                 category, 
-                title,
-                description,
-                company_id,
-                priority,
-                due_date,
                 status, 
                 is_read 
             } = req.body;
-            console.log('📝 Updating briefing:', id, { type, category, title, status, is_read });
+            console.log('📝 Updating briefing:', id, { type, category, status, is_read });
             
             const updateData = {
                 updated_at: new Date().toISOString()
@@ -131,11 +116,6 @@ class BriefingController {
             
             if (type !== undefined) updateData.type = type;
             if (category !== undefined) updateData.category = category;
-            if (title !== undefined) updateData.title = title;
-            if (description !== undefined) updateData.description = description;
-            if (company_id !== undefined) updateData.company_id = company_id;
-            if (priority !== undefined) updateData.priority = priority;
-            if (due_date !== undefined) updateData.due_date = due_date;
             if (status !== undefined) updateData.status = status;
             if (is_read !== undefined) updateData.is_read = is_read;
             

@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   MessageSquare,
   User2,
+  Users,
   Zap,
   ArrowLeft,
   ArrowRight,
@@ -24,6 +25,7 @@ import {
 import { Button } from "../ui/button"
 import { motion, AnimatePresence } from "framer-motion"
 import AdminSubmenu from "./AdminSubmenu"
+import RRHHSubmenu from "./RRHHSubmenu"
 
 interface DashboardSidebarProps {
   isOpen: boolean
@@ -34,6 +36,7 @@ export default function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarP
   const [activeLink, setActiveLink] = useState("/dashboard")
   const [hoveredLink, setHoveredLink] = useState<string | null>(null)
   const [expandedAdmin, setExpandedAdmin] = useState(false)
+  const [expandedRRHH, setExpandedRRHH] = useState(false)
   
   // Handle route change to update active link
   useEffect(() => {
@@ -41,15 +44,23 @@ export default function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarP
     setActiveLink(path)
     
     // Auto-expand admin submenu when on admin routes
-    if (path.includes('/dashboard/') && path !== '/dashboard') {
+    if (path.includes('/dashboard/') && path !== '/dashboard' && !path.includes('/dashboard/rrhh/')) {
       setExpandedAdmin(true)
+      setExpandedRRHH(false)
+    } else if (path.includes('/dashboard/rrhh/')) {
+      setExpandedRRHH(true)
+      setExpandedAdmin(false)
     } else if (path === '/dashboard') {
       setExpandedAdmin(false)
+      setExpandedRRHH(false)
     }
   }, [activeLink])
 
   // Check if current route is an admin route
-  const isAdminRoute = activeLink.includes('/dashboard/') && activeLink !== '/dashboard'
+  const isAdminRoute = activeLink.includes('/dashboard/') && activeLink !== '/dashboard' && !activeLink.includes('/dashboard/rrhh/')
+  
+  // Check if current route is an RRHH route
+  const isRRHHRoute = activeLink.includes('/dashboard/rrhh/')
 
   const navItems = [
     { path: "/dashboard", icon: <LayoutDashboard />, label: "Dashboard" },
@@ -199,6 +210,52 @@ export default function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarP
             </motion.div>
           )}
         </div>
+
+        {/* Sección de RRHH */}
+        <div className="mt-4 mb-2 text-xs font-bold text-indigo-200 uppercase tracking-wider pl-2">RRHH</div>
+        
+        {/* RRHH Principal */}
+        <div
+          className={`
+            group relative flex items-center px-3 py-2.5 rounded-xl transition-all duration-300 cursor-pointer
+            ${expandedRRHH || isRRHHRoute
+              ? "bg-gradient-to-r from-white/90 to-white/80 text-blue-800 font-medium shadow-xl border border-white/40" 
+              : "text-white hover:bg-white/10 border border-transparent"
+            }
+          `}
+          onClick={() => setExpandedRRHH(!expandedRRHH)}
+        >
+          <motion.div 
+            whileHover={{ scale: 1.15, rotate: 5 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            className={`w-5 h-5 flex items-center justify-center ${expandedRRHH || isRRHHRoute ? "text-blue-700" : "text-blue-100"}`}
+          >
+            <Users />
+          </motion.div>
+          <AnimatePresence>
+            {isOpen && (
+              <motion.span
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className={`ml-3 text-xs font-medium tracking-wide flex-1 ${expandedRRHH || isRRHHRoute ? "text-blue-800" : "text-blue-100"}`}
+              >
+                RRHH
+              </motion.span>
+            )}
+          </AnimatePresence>
+          
+          {/* Botón expandir/colapsar */}
+          {isOpen && (
+            <motion.div
+              animate={{ rotate: expandedRRHH ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ChevronDown className="h-3 w-3 text-blue-100" />
+            </motion.div>
+          )}
+        </div>
       </nav>
     </motion.div>
 
@@ -206,6 +263,13 @@ export default function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarP
     <AdminSubmenu 
       isVisible={expandedAdmin} 
       onClose={() => setExpandedAdmin(false)}
+      isSidebarOpen={isOpen}
+    />
+
+    {/* Componente de Submenú de RRHH */}
+    <RRHHSubmenu 
+      isVisible={expandedRRHH} 
+      onClose={() => setExpandedRRHH(false)}
       isSidebarOpen={isOpen}
     />
   </>

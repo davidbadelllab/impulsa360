@@ -4,6 +4,8 @@ import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = Router();
 
+
+
 // Aplicar middleware de autenticación a todas las rutas
 router.use(authMiddleware);
 
