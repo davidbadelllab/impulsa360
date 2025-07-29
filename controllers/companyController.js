@@ -211,7 +211,7 @@ export const deleteCompany = async (req, res) => {
       console.log('⚠️ Company has dependencies:', dependencies);
       return res.status(400).json({
         success: false,
-        message: 'Cannot delete company with associated clients, teams, or users. Remove dependencies first.',
+        message: 'No se puede eliminar la compañía porque tiene dependencias asociadas (clientes, equipos o usuarios). Elimine las dependencias primero.',
         dependencies: dependencies
       });
     }
@@ -243,4 +243,4 @@ export const deleteCompany = async (req, res) => {
       error: error.message 
     });
   }
-}; 
+};
