@@ -321,6 +321,24 @@ app.delete('/api/users/:id', authMiddleware, async (req, res) => {
       dependencies.push(`Participante en ${meetingParticipants.length} reunión(es)`);
     }
     
+    // Verificar en boards (creados por el usuario)
+    const { data: boards } = await supabase
+      .from('boards')
+      .select('id')
+      .eq('created_by', id);
+    if (boards && boards.length > 0) {
+      dependencies.push(`Creador de ${boards.length} tablero(s)`);
+    }
+    
+    // Verificar en briefings (creados por el usuario) 
+    const { data: briefings } = await supabase
+      .from('briefings')
+      .select('id')
+      .eq('created_by', id);
+    if (briefings && briefings.length > 0) {
+      dependencies.push(`Creador de ${briefings.length} briefing(s)`);
+    }
+    
     // Si hay dependencias, hacer soft delete en lugar de hard delete
     if (dependencies.length > 0) {
       console.log('⚠️ User has dependencies, performing soft delete:', dependencies);
