@@ -4,17 +4,54 @@ import api from '../../lib/api';
 
 interface Briefing {
   id: number;
-  type: string;
-  category: string;
-  title: string;
-  description: string;
-  company_id?: number;
-  priority: 'low' | 'medium' | 'high';
-  due_date?: string;
+  template_id: number;
+  company_name: string;
+  contact_name: string;
+  contact_email: string;
+  contact_phone?: string;
+  contact_position?: string;
+  company_website?: string;
+  company_size?: string;
+  industry?: string;
+  responses: any;
+  form_progress: number;
   status: string;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  estimated_budget?: string;
+  quoted_budget?: number;
+  approved_budget?: number;
+  timeline_estimate?: string;
+  public_url: string;
+  access_token: string;
+  qr_code_url?: string;
+  expires_at: string;
+  submitted_at?: string;
+  reviewed_at?: string;
+  approved_at?: string;
+  completed_at?: string;
+  internal_notes?: string;
+  client_feedback?: string;
   is_read: boolean;
+  is_archived: boolean;
+  assigned_to?: number;
   created_at: string;
   updated_at: string;
+  briefing_template: {
+    name: string;
+    slug: string;
+    description?: string;
+    estimated_duration?: string;
+    price_range?: string;
+    questions: any;
+    required_fields: any;
+    form_settings: any;
+    briefing_category: {
+      name: string;
+      description?: string;
+      icon?: string;
+      color: string;
+    };
+  };
 }
 
 const BriefingShow: React.FC = () => {
@@ -30,10 +67,10 @@ const BriefingShow: React.FC = () => {
   const fetchBriefing = async () => {
     try {
       const response = await api.get(`/briefings/${id}`);
-      if (response.data.success) {
-        setBriefing(response.data.data);
+      if ((response.data as any).success) {
+        setBriefing((response.data as any).data);
         // Marcar como leído si no lo está
-        if (!response.data.data.is_read) {
+        if (!(response.data as any).data.is_read) {
           markAsRead();
         }
       } else {
@@ -143,23 +180,30 @@ const BriefingShow: React.FC = () => {
               </dd>
             </div>
             <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Tipo</dt>
+              <dt className="text-sm font-medium text-gray-500">Template</dt>
               <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeColor(briefing.type)}`}>
-                  {briefing.type}
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium`} style={{backgroundColor: briefing.briefing_template.briefing_category.color + '20', color: briefing.briefing_template.briefing_category.color}}>
+                  {briefing.briefing_template.name}
                 </span>
               </dd>
             </div>
             <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Título</dt>
+              <dt className="text-sm font-medium text-gray-500">Categoría</dt>
               <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                {briefing.title || 'Sin título'}
+                {briefing.briefing_template.briefing_category.name}
               </dd>
             </div>
             <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Categoría</dt>
+              <dt className="text-sm font-medium text-gray-500">Empresa</dt>
               <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                {briefing.category || 'Sin categoría'}
+                {briefing.company_name}
+              </dd>
+            </div>
+            <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt className="text-sm font-medium text-gray-500">Contacto</dt>
+              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                {briefing.contact_name} ({briefing.contact_email})
+                {briefing.contact_phone && <div className="text-xs text-gray-500">{briefing.contact_phone}</div>}
               </dd>
             </div>
             <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -176,15 +220,24 @@ const BriefingShow: React.FC = () => {
               </dd>
             </div>
             <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Fecha de Entrega</dt>
+              <dt className="text-sm font-medium text-gray-500">Progreso del Formulario</dt>
               <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                {briefing.due_date ? new Date(briefing.due_date).toLocaleDateString() : 'No especificada'}
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div className="bg-blue-600 h-2.5 rounded-full" style={{width: `${briefing.form_progress}%`}}></div>
+                </div>
+                <span className="text-xs text-gray-500">{briefing.form_progress}%</span>
               </dd>
             </div>
             <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Descripción</dt>
+              <dt className="text-sm font-medium text-gray-500">Presupuesto Estimado</dt>
               <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                {briefing.description || 'Sin descripción'}
+                {briefing.estimated_budget || 'No especificado'}
+              </dd>
+            </div>
+            <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt className="text-sm font-medium text-gray-500">Fecha de Expiración</dt>
+              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                {briefing.expires_at ? new Date(briefing.expires_at).toLocaleDateString() : 'No especificada'}
               </dd>
             </div>
             <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">

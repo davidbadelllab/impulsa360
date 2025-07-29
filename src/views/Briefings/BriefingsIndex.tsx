@@ -4,17 +4,57 @@ import api from '../../lib/api';
 
 interface Briefing {
   id: number;
-  type: string;
-  category: string;
-  title: string;
-  description: string;
-  company_id?: number;
-  priority: 'low' | 'medium' | 'high';
-  due_date?: string;
+  template_id: number;
+  company_name: string;
+  contact_name: string;
+  contact_email: string;
+  contact_phone?: string;
+  contact_position?: string;
+  company_website?: string;
+  company_size?: string;
+  industry?: string;
+  responses: any;
+  form_progress: number;
   status: string;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  estimated_budget?: string;
+  quoted_budget?: number;
+  approved_budget?: number;
+  timeline_estimate?: string;
+  public_url: string;
+  access_token: string;
+  qr_code_url?: string;
+  expires_at: string;
+  submitted_at?: string;
+  reviewed_at?: string;
+  approved_at?: string;
+  completed_at?: string;
+  ip_address?: string;
+  user_agent?: string;
+  referrer?: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  client_notifications: boolean;
+  internal_notifications: boolean;
+  internal_notes?: string;
+  client_feedback?: string;
   is_read: boolean;
+  is_archived: boolean;
+  assigned_to?: number;
   created_at: string;
   updated_at: string;
+  briefing_template: {
+    name: string;
+    slug: string;
+    description?: string;
+    estimated_duration?: string;
+    price_range?: string;
+    briefing_category: {
+      name: string;
+      color: string;
+    };
+  };
 }
 
 const BriefingsIndex: React.FC = () => {
@@ -29,8 +69,8 @@ const BriefingsIndex: React.FC = () => {
   const fetchBriefings = async () => {
     try {
       const response = await api.get('/briefings');
-      if (response.data.success) {
-        setBriefings(response.data.data);
+      if ((response.data as any).success) {
+        setBriefings((response.data as any).data);
       } else {
         setError('Error al cargar briefings');
       }
@@ -49,7 +89,7 @@ const BriefingsIndex: React.FC = () => {
 
     try {
       const response = await api.delete(`/briefings/${id}`);
-      if (response.data.success) {
+      if ((response.data as any).success) {
         setBriefings(briefings.filter(b => b.id !== id));
       } else {
         setError('Error al eliminar briefing');
@@ -98,12 +138,20 @@ const BriefingsIndex: React.FC = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Briefings</h1>
-        <Link
-          to="/dashboard/briefings/create"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Crear Briefing
-        </Link>
+        <div className="flex space-x-2">
+          <Link
+            to="/dashboard/briefings/generate"
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Generar Briefing
+          </Link>
+          <Link
+            to="/dashboard/briefings/create"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Crear Briefing
+          </Link>
+        </div>
       </div>
 
       {error && (
@@ -124,14 +172,14 @@ const BriefingsIndex: React.FC = () => {
                 <div className="px-6 py-4 flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeColor(briefing.type)}`}>
-                        {briefing.type}
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium`} style={{backgroundColor: briefing.briefing_template.briefing_category.color + '20', color: briefing.briefing_template.briefing_category.color}}>
+                        {briefing.briefing_template.briefing_category.name}
                       </span>
                     </div>
                     <div className="ml-4">
                       <div className="flex items-center">
                         <div className="text-sm font-medium text-gray-900">
-                          {briefing.title || 'Sin título'}
+                          {briefing.company_name}
                         </div>
                         <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(briefing.status)}`}>
                           {briefing.status}
@@ -143,11 +191,11 @@ const BriefingsIndex: React.FC = () => {
                         )}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {briefing.category || 'Sin categoría'} • Prioridad: {briefing.priority || 'Media'}
+                        {briefing.briefing_template.name} • Prioridad: {briefing.priority || 'medium'}
                       </div>
                       <div className="text-xs text-gray-400">
                         Creado: {new Date(briefing.created_at).toLocaleDateString()}
-                        {briefing.due_date && ` • Entrega: ${new Date(briefing.due_date).toLocaleDateString()}`}
+                        {briefing.submitted_at && ` • Enviado: ${new Date(briefing.submitted_at).toLocaleDateString()}`}
                       </div>
                     </div>
                   </div>

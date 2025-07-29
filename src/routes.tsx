@@ -1,3 +1,4 @@
+import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import { dashboardRoutes } from './views/Dashboard/Dashboard';
 import LinkTree from './views/LinkTree/LinkTree';
@@ -25,6 +26,7 @@ import ComponentsSuccessCases from './components/ComponentsSuccessCases.jsx';
 import AgileServices from './components/AgileServices.jsx';
 import ProtectedRoute from './components/Layout/ProtectedRoute';
 import VideoConferencePage from './views/Dashboard/VideoConferencePage';
+import PublicBriefingForm from './views/Briefings/PublicBriefingForm';
 
 const router = createBrowserRouter([
   {
@@ -110,6 +112,10 @@ const router = createBrowserRouter([
   {
     path: '/linktree',
     element: <LinkTree />
+  },
+  {
+    path: '/briefing/:publicUrl',
+    element: <PublicBriefingForm />
   }
 ]);
 

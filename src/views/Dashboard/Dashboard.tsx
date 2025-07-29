@@ -23,6 +23,7 @@ import BriefingsIndex from '../Briefings/BriefingsIndex';
 import BriefingShow from '../Briefings/BriefingShow';
 import BriefingCreate from '../Briefings/BriefingCreate';
 import BriefingEdit from '../Briefings/BriefingEdit';
+import BriefingGenerate from '../Briefings/BriefingGenerate';
 import { useAuth } from "../../context/AuthContext"
 
 export default function Dashboard() {
@@ -133,5 +134,9 @@ export const dashboardRoutes = [
   {
     path: 'briefings/:id/edit',
     element: <BriefingEdit />
+  },
+  {
+    path: 'briefings/generate',
+    element: <BriefingGenerate />
   }
 ]

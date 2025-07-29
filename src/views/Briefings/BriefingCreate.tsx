@@ -8,6 +8,8 @@ import {
   Loader
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Textarea } from '../../components/ui/textarea';
 import { Label } from '../../components/ui/label';
 import {
   Select,
@@ -29,15 +31,25 @@ import api from '../../lib/api';
 interface BriefingForm {
   type: string;
   category: string;
+  title: string;
+  description: string;
+  company_id?: number;
+  priority: 'low' | 'medium' | 'high';
+  due_date?: string;
 }
 
 const BriefingCreate: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [companies, setCompanies] = useState<any[]>([]);
   const [form, setForm] = useState<BriefingForm>({
     type: '',
-    category: ''
+    category: '',
+    title: '',
+    description: '',
+    priority: 'medium',
+    due_date: ''
   });
 
   const briefingTypes = [
@@ -58,6 +70,20 @@ const BriefingCreate: React.FC = () => {
     { value: 'Branding', label: 'Branding' },
     { value: 'Otro', label: 'Otro' }
   ];
+
+  // Cargar empresas al montar el componente
+  React.useEffect(() => {
+    fetchCompanies();
+  }, []);
+
+  const fetchCompanies = async () => {
+    try {
+      const response = await api.get('/companies');
+      setCompanies((response.data as any).data || []);
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -169,6 +195,81 @@ const BriefingCreate: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="title">Título del Proyecto</Label>
+              <Input
+                id="title"
+                value={form.title}
+                onChange={(e) => handleChange('title', e.target.value)}
+                placeholder="Ej: Rediseño de sitio web corporativo"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="priority">Prioridad</Label>
+              <Select value={form.priority} onValueChange={(value: any) => handleChange('priority', value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Baja</SelectItem>
+                  <SelectItem value="medium">Media</SelectItem>
+                  <SelectItem value="high">Alta</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="company">Empresa (Opcional)</Label>
+              <Select value={form.company_id?.toString() || ''} onValueChange={(value) => handleChange('company_id', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona una empresa" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {companies.map((company) => (
+                      <SelectItem key={company.id} value={company.id.toString()}>
+                        {company.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="due_date">Fecha de Entrega</Label>
+              <Input
+                id="due_date"
+                type="date"
+                value={form.due_date}
+                onChange={(e) => handleChange('due_date', e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Descripción */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <FileText className="h-5 w-5" />
+              <span>Descripción del Proyecto</span>
+            </CardTitle>
+            <CardDescription>
+              Describe detalladamente los requerimientos y objetivos del proyecto
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Textarea
+              value={form.description}
+              onChange={(e) => handleChange('description', e.target.value)}
+              placeholder="Describe los objetivos, requerimientos, público objetivo, características específicas, y cualquier otra información relevante para el proyecto..."
+              rows={6}
+              className="resize-none"
+            />
           </CardContent>
         </Card>
 
@@ -184,7 +285,7 @@ const BriefingCreate: React.FC = () => {
           </Button>
           <Button
             type="submit"
-            disabled={loading || !form.type}
+            disabled={loading || !form.type || !form.title}
             className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
           >
             {loading ? (
