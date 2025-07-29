@@ -100,16 +100,43 @@ app.get('/api/test-auth', authMiddleware, (req, res) => {
 // Endpoint para obtener usuarios
 app.get('/api/users', authMiddleware, async (req, res) => {
   try {
+    console.log('📋 Fetching users');
+    
+    // Obtener usuarios activos (no eliminados)
     const { data, error } = await supabase
       .from('users')
-      .select('*');
+      .select(`
+        id,
+        username,
+        email,
+        role_id,
+        company_id,
+        is_active,
+        is_superadmin,
+        last_login,
+        created_at,
+        updated_at,
+        deleted_at
+      `)
+      .is('deleted_at', null) // Solo usuarios no eliminados
+      .order('created_at', { ascending: false });
     
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Supabase error fetching users:', error);
+      throw error;
+    }
     
-    res.json({ data });
+    console.log(`✅ Fetched ${data?.length || 0} users successfully`);
+    res.json({ 
+      success: true,
+      data: data || [] 
+    });
   } catch (error) {
-    console.error('Error obteniendo usuarios:', error);
-    res.status(500).json({ error: error.message });
+    console.error('💥 Error fetching users:', error);
+    res.status(500).json({ 
+      success: false,
+      error: error.message 
+    });
   }
 });
 
@@ -119,15 +146,50 @@ app.post('/api/users', authMiddleware, async (req, res) => {
     console.log('📝 Creating user:', req.body);
     const userData = req.body;
     
-    // Hashear la contraseña si existe
-    if (userData.password) {
-      const bcrypt = await import('bcryptjs');
-      userData.password = await bcrypt.default.hash(userData.password, 10);
+    // Validar datos requeridos
+    if (!userData.username || !userData.email || !userData.password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Username, email y password son requeridos'
+      });
     }
+    
+    // Verificar si el usuario ya existe
+    const { data: existingUser, error: checkError } = await supabase
+      .from('users')
+      .select('id, username, email')
+      .or(`username.eq.${userData.username},email.eq.${userData.email}`)
+      .single();
+    
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: existingUser.username === userData.username 
+          ? 'El nombre de usuario ya existe' 
+          : 'El email ya existe'
+      });
+    }
+    
+    // Preparar datos del usuario
+    const newUserData = {
+      username: userData.username,
+      email: userData.email,
+      password: userData.password,
+      role_id: userData.role_id || 2, // Default role
+      company_id: userData.company_id || null,
+      is_active: userData.is_active !== undefined ? userData.is_active : true,
+      is_superadmin: userData.is_superadmin || false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    
+    // Hashear la contraseña
+    const bcrypt = await import('bcryptjs');
+    newUserData.password = await bcrypt.default.hash(newUserData.password, 10);
     
     const { data, error } = await supabase
       .from('users')
-      .insert([userData])
+      .insert([newUserData])
       .select()
       .single();
     
@@ -140,7 +202,16 @@ app.post('/api/users', authMiddleware, async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Usuario creado exitosamente',
-      data: data
+      data: {
+        id: data.id,
+        username: data.username,
+        email: data.email,
+        role_id: data.role_id,
+        company_id: data.company_id,
+        is_active: data.is_active,
+        is_superadmin: data.is_superadmin,
+        created_at: data.created_at
+      }
     });
   } catch (error) {
     console.error('💥 Error creating user:', error);
@@ -199,24 +270,120 @@ app.delete('/api/users/:id', authMiddleware, async (req, res) => {
     console.log('🗑️ Deleting user:', req.params.id);
     const { id } = req.params;
     
-    const { data, error } = await supabase
+    // Verificar si el usuario existe
+    const { data: existingUser, error: fetchError } = await supabase
       .from('users')
-      .delete()
+      .select('id, username, email')
       .eq('id', id)
-      .select()
       .single();
     
-    if (error) {
-      console.error('❌ Supabase error deleting user:', error);
-      throw error;
+    if (fetchError || !existingUser) {
+      console.log('❌ User not found:', id);
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
     }
     
-    console.log('✅ User deleted successfully:', data.id);
-    res.json({
-      success: true,
-      message: 'Usuario eliminado exitosamente',
-      data: data
-    });
+    // Verificar si hay dependencias críticas antes de eliminar
+    // Buscar en tablas que podrían tener referencias al usuario
+    const dependencies = [];
+    
+    // Verificar en team_members
+    const { data: teamMembers } = await supabase
+      .from('team_members')
+      .select('id')
+      .eq('user_id', id);
+    if (teamMembers && teamMembers.length > 0) {
+      dependencies.push(`Miembro de ${teamMembers.length} equipo(s)`);
+    }
+    
+    // Verificar en tasks
+    const { data: tasks } = await supabase
+      .from('tasks')
+      .select('id')
+      .eq('user_id', id);
+    if (tasks && tasks.length > 0) {
+      dependencies.push(`${tasks.length} tarea(s) asignada(s)`);
+    }
+    
+    // Verificar en task_comments
+    const { data: taskComments } = await supabase
+      .from('task_comments')
+      .select('id')
+      .eq('user_id', id);
+    if (taskComments && taskComments.length > 0) {
+      dependencies.push(`${taskComments.length} comentario(s) en tareas`);
+    }
+    
+    // Verificar en meetings
+    const { data: meetings } = await supabase
+      .from('meetings')
+      .select('id')
+      .eq('host_id', id);
+    if (meetings && meetings.length > 0) {
+      dependencies.push(`${meetings.length} reunión(es) como anfitrión`);
+    }
+    
+    // Verificar en meeting_participants
+    const { data: meetingParticipants } = await supabase
+      .from('meeting_participants')
+      .select('id')
+      .eq('user_id', id);
+    if (meetingParticipants && meetingParticipants.length > 0) {
+      dependencies.push(`Participante en ${meetingParticipants.length} reunión(es)`);
+    }
+    
+    // Si hay dependencias, hacer soft delete en lugar de hard delete
+    if (dependencies.length > 0) {
+      console.log('⚠️ User has dependencies, performing soft delete:', dependencies);
+      
+      const { data: softDeletedUser, error: softDeleteError } = await supabase
+        .from('users')
+        .update({ 
+          is_active: false,
+          deleted_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (softDeleteError) {
+        console.error('❌ Error in soft delete:', softDeleteError);
+        throw softDeleteError;
+      }
+      
+      console.log('✅ User soft deleted successfully:', softDeletedUser.id);
+      res.json({
+        success: true,
+        message: 'Usuario desactivado exitosamente (tiene dependencias activas)',
+        data: softDeletedUser,
+        dependencies: dependencies
+      });
+    } else {
+      // No hay dependencias, proceder con eliminación física
+      console.log('✅ No dependencies found, performing hard delete');
+      
+      const { data: deletedUser, error: deleteError } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (deleteError) {
+        console.error('❌ Supabase error deleting user:', deleteError);
+        throw deleteError;
+      }
+      
+      console.log('✅ User hard deleted successfully:', deletedUser.id);
+      res.json({
+        success: true,
+        message: 'Usuario eliminado exitosamente',
+        data: deletedUser
+      });
+    }
   } catch (error) {
     console.error('💥 Error deleting user:', error);
     res.status(500).json({ 
