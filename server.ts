@@ -405,6 +405,14 @@ app.delete('/api/companies/:id', async (req: Request, res: Response) => {
     console.log('🗑️ Deleting company:', req.params.id);
     const { id } = req.params;
     
+    // Validar que el ID sea un número
+    if (!id || isNaN(Number(id))) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de compañía inválido'
+      });
+    }
+    
     // Verificar si la compañía existe
     const { data: existingCompany, error: fetchError } = await supabase
       .from('companies')
@@ -412,7 +420,18 @@ app.delete('/api/companies/:id', async (req: Request, res: Response) => {
       .eq('id', id)
       .single();
     
-    if (fetchError || !existingCompany) {
+    if (fetchError) {
+      console.error('❌ Error fetching company:', fetchError);
+      if (fetchError.code === 'PGRST116') {
+        return res.status(404).json({
+          success: false,
+          message: 'Compañía no encontrada'
+        });
+      }
+      throw fetchError;
+    }
+    
+    if (!existingCompany) {
       console.log('❌ Company not found:', id);
       return res.status(404).json({
         success: false,
@@ -420,34 +439,50 @@ app.delete('/api/companies/:id', async (req: Request, res: Response) => {
       });
     }
     
+    console.log('✅ Company found:', existingCompany.name);
+    
     // Verificar dependencias antes de eliminar
     const dependencies = [];
     
-    // Verificar usuarios asociados
-    const { data: users } = await supabase
-      .from('users')
-      .select('id')
-      .eq('company_id', id);
-    if (users && users.length > 0) {
-      dependencies.push(`${users.length} usuario(s) asociado(s)`);
-    }
-    
-    // Verificar clientes asociados
-    const { data: clients } = await supabase
-      .from('clients')
-      .select('id')
-      .eq('company_id', id);
-    if (clients && clients.length > 0) {
-      dependencies.push(`${clients.length} cliente(s) asociado(s)`);
-    }
-    
-    // Verificar equipos asociados
-    const { data: teams } = await supabase
-      .from('teams')
-      .select('id')
-      .eq('company_id', id);
-    if (teams && teams.length > 0) {
-      dependencies.push(`${teams.length} equipo(s) asociado(s)`);
+    try {
+      // Verificar usuarios asociados
+      const { data: users, error: usersError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('company_id', id);
+      
+      if (usersError) {
+        console.error('❌ Error checking users:', usersError);
+      } else if (users && users.length > 0) {
+        dependencies.push(`${users.length} usuario(s) asociado(s)`);
+      }
+      
+      // Verificar clientes asociados
+      const { data: clients, error: clientsError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('company_id', id);
+      
+      if (clientsError) {
+        console.error('❌ Error checking clients:', clientsError);
+      } else if (clients && clients.length > 0) {
+        dependencies.push(`${clients.length} cliente(s) asociado(s)`);
+      }
+      
+      // Verificar equipos asociados
+      const { data: teams, error: teamsError } = await supabase
+        .from('teams')
+        .select('id')
+        .eq('company_id', id);
+      
+      if (teamsError) {
+        console.error('❌ Error checking teams:', teamsError);
+      } else if (teams && teams.length > 0) {
+        dependencies.push(`${teams.length} equipo(s) asociado(s)`);
+      }
+    } catch (dependencyError) {
+      console.error('❌ Error checking dependencies:', dependencyError);
+      // Continuar con la eliminación incluso si hay error en dependencias
     }
     
     // Si hay dependencias, no permitir eliminación
@@ -459,6 +494,8 @@ app.delete('/api/companies/:id', async (req: Request, res: Response) => {
         dependencies: dependencies
       });
     }
+    
+    console.log('✅ No dependencies found, proceeding with deletion');
     
     // Proceder con la eliminación
     const { data: deletedCompany, error: deleteError } = await supabase
