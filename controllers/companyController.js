@@ -224,13 +224,50 @@ export const deleteCompany = async (req, res) => {
       dependencies.push(`${teams.length} equipo(s) asociado(s)`);
     }
     
-    // Si hay dependencias, no permitir eliminación
+    // Verificar boards asociados (esta era la dependencia faltante)
+    const { data: boards } = await supabase
+      .from('boards')
+      .select('id')
+      .eq('company_id', id);
+    if (boards && boards.length > 0) {
+      dependencies.push(`${boards.length} tablero(s) asociado(s)`);
+    }
+    
+    // Verificar tareas asociadas
+    const { data: tasks } = await supabase
+      .from('tasks')
+      .select('id')
+      .eq('company_id', id);
+    if (tasks && tasks.length > 0) {
+      dependencies.push(`${tasks.length} tarea(s) asociada(s)`);
+    }
+    
+    // Verificar servicios contratados
+    const { data: companyServices } = await supabase
+      .from('company_services')
+      .select('id')
+      .eq('company_id', id);
+    if (companyServices && companyServices.length > 0) {
+      dependencies.push(`${companyServices.length} servicio(s) contratado(s)`);
+    }
+    
+    // Verificar planes asociados
+    const { data: companyPlans } = await supabase
+      .from('company_plans')
+      .select('id')
+      .eq('company_id', id);
+    if (companyPlans && companyPlans.length > 0) {
+      dependencies.push(`${companyPlans.length} plan(es) asociado(s)`);
+    }
+    
+    // Si hay dependencias, ofrecer soft delete o mostrar error detallado
     if (dependencies.length > 0) {
       console.log('⚠️ Company has dependencies:', dependencies);
       return res.status(400).json({
         success: false,
-        message: 'No se puede eliminar la compañía porque tiene dependencias asociadas (clientes, equipos o usuarios). Elimine las dependencias primero.',
-        dependencies: dependencies
+        message: `No se puede eliminar la compañía "${existingCompany.name}" porque tiene dependencias asociadas. Debe eliminar o reasignar las siguientes dependencias primero:`,
+        dependencies: dependencies,
+        suggestion: 'Considere reasignar los elementos a otra compañía o realizar una eliminación suave (soft delete) marcando la compañía como inactiva.'
       });
     }
     
