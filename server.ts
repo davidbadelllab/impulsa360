@@ -480,6 +480,43 @@ app.delete('/api/companies/:id', async (req: Request, res: Response) => {
       } else if (teams && teams.length > 0) {
         dependencies.push(`${teams.length} equipo(s) asociado(s)`);
       }
+      
+      // Verificar boards asociados (tableros de tareas)
+      const { data: boards, error: boardsError } = await supabase
+        .from('boards')
+        .select('id')
+        .eq('company_id', id);
+      
+      if (boardsError) {
+        console.error('❌ Error checking boards:', boardsError);
+      } else if (boards && boards.length > 0) {
+        dependencies.push(`${boards.length} tablero(s) de tareas asociado(s)`);
+      }
+      
+      // Verificar briefings asociados
+      const { data: briefings, error: briefingsError } = await supabase
+        .from('briefings')
+        .select('id')
+        .eq('company_id', id);
+      
+      if (briefingsError) {
+        console.error('❌ Error checking briefings:', briefingsError);
+      } else if (briefings && briefings.length > 0) {
+        dependencies.push(`${briefings.length} briefing(s) asociado(s)`);
+      }
+      
+      // Verificar meetings asociados
+      const { data: meetings, error: meetingsError } = await supabase
+        .from('meetings')
+        .select('id')
+        .eq('company_id', id);
+      
+      if (meetingsError) {
+        console.error('❌ Error checking meetings:', meetingsError);
+      } else if (meetings && meetings.length > 0) {
+        dependencies.push(`${meetings.length} reunión(es) asociada(s)`);
+      }
+      
     } catch (dependencyError) {
       console.error('❌ Error checking dependencies:', dependencyError);
       // Continuar con la eliminación incluso si hay error en dependencias
@@ -490,7 +527,7 @@ app.delete('/api/companies/:id', async (req: Request, res: Response) => {
       console.log('⚠️ Company has dependencies:', dependencies);
       return res.status(400).json({
         success: false,
-        message: 'No se puede eliminar la compañía porque tiene dependencias asociadas (clientes, equipos o usuarios). Elimine las dependencias primero.',
+        message: 'No se puede eliminar la compañía porque tiene dependencias asociadas. Elimine las dependencias primero.',
         dependencies: dependencies
       });
     }
