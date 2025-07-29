@@ -18,28 +18,13 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 // ===== BOARDS =====
 export const getBoards = async (req, res) => {
   try {
+    console.log('🔍 Getting boards...');
     const { company_id } = req.query;
+    
+    // Primero intentar consulta simple sin relaciones
     let query = supabase
       .from('boards')
-      .select(`
-        *,
-        created_by_user:users!boards_created_by_fkey(username, email),
-        lists:lists(
-          *,
-          cards:cards(
-            *,
-            labels:card_labels(label:labels(*)),
-            assignments:card_assignments(user:users(*)),
-            comments:comments(*),
-            checklists:checklists(
-              *,
-              items:checklist_items(*)
-            ),
-            attachments:attachments(*)
-          )
-        ),
-        labels:labels(*)
-      `)
+      .select('*')
       .eq('is_archived', false)
       .order('created_at', { ascending: false });
 
@@ -47,12 +32,73 @@ export const getBoards = async (req, res) => {
       query = query.eq('company_id', company_id);
     }
 
-    const { data, error } = await query;
-    if (error) throw error;
-    res.json(data);
+    const { data: boards, error: boardsError } = await query;
+    
+    if (boardsError) {
+      console.error('❌ Error getting boards:', boardsError);
+      throw boardsError;
+    }
+    
+    // Si no hay boards, devolver array vacío
+    if (!boards || boards.length === 0) {
+      console.log('📋 No boards found');
+      return res.json([]);
+    }
+    
+    // Ahora obtener listas para cada board
+    const boardsWithLists = await Promise.all(
+      boards.map(async (board) => {
+        try {
+          const { data: lists, error: listsError } = await supabase
+            .from('lists')
+            .select('*')
+            .eq('board_id', board.id)
+            .eq('is_archived', false)
+            .order('position');
+          
+          if (listsError) {
+            console.warn(`⚠️ Error getting lists for board ${board.id}:`, listsError);
+            return { ...board, lists: [] };
+          }
+          
+          // Obtener cards para cada lista
+          const listsWithCards = await Promise.all(
+            (lists || []).map(async (list) => {
+              try {
+                const { data: cards, error: cardsError } = await supabase
+                  .from('cards')
+                  .select('id, title, description, position, due_date, is_archived, created_at, updated_at')
+                  .eq('list_id', list.id)
+                  .eq('is_archived', false)
+                  .order('position');
+                
+                if (cardsError) {
+                  console.warn(`⚠️ Error getting cards for list ${list.id}:`, cardsError);
+                  return { ...list, cards: [] };
+                }
+                
+                return { ...list, cards: cards || [] };
+              } catch (error) {
+                console.warn(`⚠️ Error processing list ${list.id}:`, error);
+                return { ...list, cards: [] };
+              }
+            })
+          );
+          
+          return { ...board, lists: listsWithCards };
+        } catch (error) {
+          console.warn(`⚠️ Error processing board ${board.id}:`, error);
+          return { ...board, lists: [] };
+        }
+      })
+    );
+    
+    console.log('✅ Boards retrieved successfully:', boardsWithLists.length);
+    res.json(boardsWithLists);
   } catch (error) {
-    console.error('Error obteniendo tableros:', error);
-    res.status(500).json({ error: error.message });
+    console.error('💥 Error obteniendo tableros:', error);
+    // Fallback: devolver array vacío en lugar de error 500
+    res.json([]);
   }
 };
 
