@@ -111,7 +111,7 @@ app.get('/api/users', authMiddleware, async (req, res) => {
         email,
         role_id,
         company_id,
-        is_active,
+        status,
         is_superadmin,
         last_login,
         created_at,
@@ -177,7 +177,7 @@ app.post('/api/users', authMiddleware, async (req, res) => {
       password: userData.password,
       role_id: userData.role_id || 2, // Default role
       company_id: userData.company_id || null,
-      is_active: userData.is_active !== undefined ? userData.is_active : true,
+      status: userData.status || 'active',
       is_superadmin: userData.is_superadmin || false,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
@@ -208,7 +208,7 @@ app.post('/api/users', authMiddleware, async (req, res) => {
         email: data.email,
         role_id: data.role_id,
         company_id: data.company_id,
-        is_active: data.is_active,
+        status: data.status,
         is_superadmin: data.is_superadmin,
         created_at: data.created_at
       }
@@ -341,7 +341,7 @@ app.delete('/api/users/:id', authMiddleware, async (req, res) => {
       const { data: softDeletedUser, error: softDeleteError } = await supabase
         .from('users')
         .update({ 
-          is_active: false,
+          status: 'inactive',
           deleted_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
