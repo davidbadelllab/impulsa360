@@ -59,7 +59,7 @@ const ConciliacionesSubmenu: React.FC<ConciliacionesSubmenuProps> = ({ isVisible
           <div className="p-4 border-b border-white/10">
             <div className="flex items-center justify-between">
               <h3 className="text-white font-semibold text-sm tracking-wide">
-                Conciliaciones
+               Finanzas
               </h3>
               <button
                 onClick={onClose}

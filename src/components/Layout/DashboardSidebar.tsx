@@ -332,7 +332,7 @@ export default function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarP
                 transition={{ duration: 0.3, ease: "easeOut" }}
                 className={`ml-3 text-xs font-medium tracking-wide flex-1 ${expandedConciliaciones || isConciliacionesRoute ? "text-teal-800" : "text-teal-100"}`}
               >
-                Conciliaciones
+               Finanzas
               </motion.span>
             )}
           </AnimatePresence>
