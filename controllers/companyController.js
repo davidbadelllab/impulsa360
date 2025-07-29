@@ -79,10 +79,20 @@ export const createCompany = async (req, res) => {
       name: req.body.name,
       address: req.body.address || null,
       email: req.body.email || null,
-      phone: req.body.phone || null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      phone: req.body.phone || null
     };
+    
+    // Asegurar campos timestamp
+    companyData.created_at = new Date().toISOString();
+    companyData.updated_at = new Date().toISOString();
+    
+    // Manejar posibles alias camelCase
+    if (req.body.createdAt) {
+      companyData.created_at = req.body.createdAt;
+    }
+    if (req.body.updatedAt) {
+      companyData.updated_at = req.body.updatedAt;
+    }
     
     const { data, error } = await supabase
       .from('companies')
@@ -116,10 +126,18 @@ export const updateCompany = async (req, res) => {
   try {
     console.log('📝 Updating company:', req.params.id, req.body);
     
+    // Verificar y preparar datos de actualización
     const updateData = {
-      ...req.body,
-      updated_at: new Date().toISOString()
+      ...req.body
     };
+    
+    // Asegurar campo updated_at existe
+    if (!updateData.updated_at && !updateData.updatedAt) {
+      updateData.updated_at = new Date().toISOString();
+    } else if (updateData.updatedAt) {
+      updateData.updated_at = updateData.updatedAt;
+      delete updateData.updatedAt;
+    }
     
     const { data, error } = await supabase
       .from('companies')

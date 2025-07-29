@@ -230,6 +230,265 @@ app.get('/api/plans', async (req: Request, res: Response) => {
   }
 });
 
+// ===== RUTAS DE COMPANIES =====
+// Obtener todas las compañías
+app.get('/api/companies', async (req: Request, res: Response) => {
+  try {
+    console.log('📋 Fetching companies');
+    
+    const { data, error } = await supabase
+      .from('companies')
+      .select('*')
+      .order('name', { ascending: true });
+    
+    if (error) {
+      console.error('❌ Supabase error fetching companies:', error);
+      throw error;
+    }
+    
+    console.log(`✅ Fetched ${data?.length || 0} companies successfully`);
+    res.json({ 
+      success: true,
+      data: data || [] 
+    });
+  } catch (error) {
+    console.error('💥 Error fetching companies:', error);
+    res.status(500).json({ 
+      success: false,
+      error: error instanceof Error ? error.message : 'Error desconocido'
+    });
+  }
+});
+
+// Obtener una compañía por ID
+app.get('/api/companies/:id', async (req: Request, res: Response) => {
+  try {
+    console.log('📋 Fetching company:', req.params.id);
+    
+    const { data, error } = await supabase
+      .from('companies')
+      .select('*')
+      .eq('id', req.params.id)
+      .single();
+    
+    if (error) {
+      console.error('❌ Supabase error fetching company:', error);
+      if (error.code === 'PGRST116') {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'Compañía no encontrada' 
+        });
+      }
+      throw error;
+    }
+    
+    console.log('✅ Company fetched successfully:', data.id);
+    res.json({ 
+      success: true,
+      data: data 
+    });
+  } catch (error) {
+    console.error('💥 Error fetching company:', error);
+    res.status(500).json({ 
+      success: false,
+      error: error instanceof Error ? error.message : 'Error desconocido'
+    });
+  }
+});
+
+// Crear una nueva compañía
+app.post('/api/companies', async (req: Request, res: Response) => {
+  try {
+    console.log('📝 Creating company:', req.body);
+    
+    const companyData: any = {
+      name: req.body.name,
+      address: req.body.address || null,
+      email: req.body.email || null,
+      phone: req.body.phone || null
+    };
+    
+    // Asegurar campos timestamp
+    companyData.created_at = new Date().toISOString();
+    companyData.updated_at = new Date().toISOString();
+    
+    // Manejar posibles alias camelCase
+    if (req.body.createdAt) {
+      companyData.created_at = req.body.createdAt;
+    }
+    if (req.body.updatedAt) {
+      companyData.updated_at = req.body.updatedAt;
+    }
+    
+    const { data, error } = await supabase
+      .from('companies')
+      .insert([companyData])
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('❌ Supabase error creating company:', error);
+      throw error;
+    }
+    
+    console.log('✅ Company created successfully:', data.id);
+    res.status(201).json({
+      success: true,
+      message: 'Compañía creada exitosamente',
+      data: data
+    });
+  } catch (error) {
+    console.error('💥 Error creating company:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error creando compañía',
+      error: error instanceof Error ? error.message : 'Error desconocido'
+    });
+  }
+});
+
+// Actualizar una compañía
+app.put('/api/companies/:id', async (req: Request, res: Response) => {
+  try {
+    console.log('📝 Updating company:', req.params.id, req.body);
+    
+    // Verificar y preparar datos de actualización
+    const updateData = {
+      ...req.body
+    };
+    
+    // Asegurar campo updated_at existe
+    if (!updateData.updated_at && !updateData.updatedAt) {
+      updateData.updated_at = new Date().toISOString();
+    } else if (updateData.updatedAt) {
+      updateData.updated_at = updateData.updatedAt;
+      delete updateData.updatedAt;
+    }
+    
+    const { data, error } = await supabase
+      .from('companies')
+      .update(updateData)
+      .eq('id', req.params.id)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('❌ Supabase error updating company:', error);
+      if (error.code === 'PGRST116') {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'Compañía no encontrada' 
+        });
+      }
+      throw error;
+    }
+    
+    console.log('✅ Company updated successfully:', data.id);
+    res.json({
+      success: true,
+      message: 'Compañía actualizada exitosamente',
+      data: data
+    });
+  } catch (error) {
+    console.error('💥 Error updating company:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error actualizando compañía',
+      error: error instanceof Error ? error.message : 'Error desconocido'
+    });
+  }
+});
+
+// Eliminar una compañía
+app.delete('/api/companies/:id', async (req: Request, res: Response) => {
+  try {
+    console.log('🗑️ Deleting company:', req.params.id);
+    const { id } = req.params;
+    
+    // Verificar si la compañía existe
+    const { data: existingCompany, error: fetchError } = await supabase
+      .from('companies')
+      .select('id, name')
+      .eq('id', id)
+      .single();
+    
+    if (fetchError || !existingCompany) {
+      console.log('❌ Company not found:', id);
+      return res.status(404).json({
+        success: false,
+        message: 'Compañía no encontrada'
+      });
+    }
+    
+    // Verificar dependencias antes de eliminar
+    const dependencies = [];
+    
+    // Verificar usuarios asociados
+    const { data: users } = await supabase
+      .from('users')
+      .select('id')
+      .eq('company_id', id);
+    if (users && users.length > 0) {
+      dependencies.push(`${users.length} usuario(s) asociado(s)`);
+    }
+    
+    // Verificar clientes asociados
+    const { data: clients } = await supabase
+      .from('clients')
+      .select('id')
+      .eq('company_id', id);
+    if (clients && clients.length > 0) {
+      dependencies.push(`${clients.length} cliente(s) asociado(s)`);
+    }
+    
+    // Verificar equipos asociados
+    const { data: teams } = await supabase
+      .from('teams')
+      .select('id')
+      .eq('company_id', id);
+    if (teams && teams.length > 0) {
+      dependencies.push(`${teams.length} equipo(s) asociado(s)`);
+    }
+    
+    // Si hay dependencias, no permitir eliminación
+    if (dependencies.length > 0) {
+      console.log('⚠️ Company has dependencies:', dependencies);
+      return res.status(400).json({
+        success: false,
+        message: 'No se puede eliminar la compañía porque tiene dependencias asociadas (clientes, equipos o usuarios). Elimine las dependencias primero.',
+        dependencies: dependencies
+      });
+    }
+    
+    // Proceder con la eliminación
+    const { data: deletedCompany, error: deleteError } = await supabase
+      .from('companies')
+      .delete()
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (deleteError) {
+      console.error('❌ Supabase error deleting company:', deleteError);
+      throw deleteError;
+    }
+    
+    console.log('✅ Company deleted successfully:', deletedCompany.id);
+    res.json({
+      success: true,
+      message: 'Compañía eliminada exitosamente',
+      data: deletedCompany
+    });
+  } catch (error) {
+    console.error('💥 Error deleting company:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error eliminando compañía',
+      error: error instanceof Error ? error.message : 'Error desconocido'
+    });
+  }
+});
+
 // Inicializar servicio de sockets
 new SocketService(io);
 
