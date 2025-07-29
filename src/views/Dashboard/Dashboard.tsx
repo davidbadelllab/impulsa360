@@ -19,6 +19,10 @@ import VideoConferencePage from './VideoConferencePage';
 import BlogAdmin from './BlogAdmin';
 import BlogCreateEdit from './BlogCreateEdit';
 import BlogDetail from './BlogDetail';
+import BriefingsIndex from '../Briefings/BriefingsIndex';
+import BriefingShow from '../Briefings/BriefingShow';
+import BriefingCreate from '../Briefings/BriefingCreate';
+import BriefingEdit from '../Briefings/BriefingEdit';
 import { useAuth } from "../../context/AuthContext"
 
 export default function Dashboard() {
@@ -113,5 +117,21 @@ export const dashboardRoutes = [
   {
     path: 'videoconference',
     element: <VideoConferencePage />
+  },
+  {
+    path: 'briefings',
+    element: <BriefingsIndex />
+  },
+  {
+    path: 'briefings/create',
+    element: <BriefingCreate />
+  },
+  {
+    path: 'briefings/:id',
+    element: <BriefingShow />
+  },
+  {
+    path: 'briefings/:id/edit',
+    element: <BriefingEdit />
   }
 ]

@@ -18,6 +18,7 @@ import dashboardRoutes from './routes/dashboardRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import blogRoutes from './routes/blogRoutes.js';
 import meetingRoutes from './routes/meetingRoutes.js';
+import briefingRoutes from './routes/briefingRoutes.js';
 import { authMiddleware } from './middlewares/authMiddleware.js';
 import { listRoutes } from './debug-routes.js';
 
@@ -60,6 +61,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/meetings', meetingRoutes);
+app.use('/api/briefings', briefingRoutes);
 
 // Endpoint para obtener el usuario actual está manejado por authRoutes
 
