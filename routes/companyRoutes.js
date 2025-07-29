@@ -1,7 +1,24 @@
 import express from 'express';
 import * as PlanController from '../controllers/planController.js';
+import { 
+  getAllCompanies, 
+  getCompanyById, 
+  createCompany, 
+  updateCompany, 
+  deleteCompany 
+} from '../controllers/companyController.js';
 
 const router = express.Router();
+
+// Rutas para compañías
+router.route('/companies')
+  .get(getAllCompanies)
+  .post(createCompany);
+
+router.route('/companies/:id')
+  .get(getCompanyById)
+  .put(updateCompany)
+  .delete(deleteCompany);
 
 // Rutas CRUD de planes
 router.get('/plans', PlanController.getAllPlans);
