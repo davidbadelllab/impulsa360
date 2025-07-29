@@ -106,7 +106,7 @@ app.get('/api/users', authMiddleware, async (req, res) => {
     const { data, error } = await supabase
       .from('users')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('id', { ascending: false });
     
     if (error) {
       console.error('❌ Supabase error fetching users:', error);
@@ -165,9 +165,7 @@ app.post('/api/users', authMiddleware, async (req, res) => {
       role_id: userData.role_id || 2, // Default role
       company_id: userData.company_id || null,
       status: userData.status || 'active',
-      is_superadmin: userData.is_superadmin || false,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      is_superadmin: userData.is_superadmin || false
     };
     
     // Hashear la contraseña
@@ -196,8 +194,7 @@ app.post('/api/users', authMiddleware, async (req, res) => {
         role_id: data.role_id,
         company_id: data.company_id,
         status: data.status,
-        is_superadmin: data.is_superadmin,
-        created_at: data.created_at
+        is_superadmin: data.is_superadmin
       }
     });
   } catch (error) {
@@ -346,8 +343,7 @@ app.delete('/api/users/:id', authMiddleware, async (req, res) => {
       const { data: softDeletedUser, error: softDeleteError } = await supabase
         .from('users')
         .update({ 
-          status: 'inactive',
-          updated_at: new Date().toISOString()
+          status: 'inactive'
         })
         .eq('id', id)
         .select()
